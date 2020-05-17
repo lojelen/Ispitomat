@@ -1,0 +1,7 @@
+{
+    "require": {
+        "graphaware/neo4j-php-client": "^4.8",
+        "graphaware/neo4j-php-ogm": "dev-master",
+        "graphaware/neo4j-bolt": "^1.11"
+    }
+}

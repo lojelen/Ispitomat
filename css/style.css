@@ -1,0 +1,61 @@
+body {
+  	max-width: 60%;
+  	margin: auto;
+  	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
+
+#title {
+	font-family: "Atomic Age";
+	font-size: 40px;
+	float: left;
+	margin: 10px;
+}
+
+#header {
+	background-color: #DED8E6;
+	border: none;
+	box-shadow: 0px 2px #9E9E9E;
+	overflow: hidden;
+}
+
+.col-1 {
+  margin-left: 100px;
+  margin-top: 20px;
+  width: 23%;
+  float: left;
+}
+
+.col-2 {
+  margin-top: 20px;
+  width: 30%;
+  float: left;
+}
+
+#login {
+  margin-right: 100px;
+  margin-top: 20px;
+  width: 10%;
+  float: right;
+}
+
+#errorMsg {
+  margin-top: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+#userID {
+	color: white;
+	float: right;
+	margin-right: 10px;
+	margin-bottom: 1px;
+	clear: right;
+}
+
+#logout {
+  color: #705E8B;
+	float: right;
+	margin-right: 10px;
+	margin-top: 1px;
+	clear: right;
+}
