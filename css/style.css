@@ -95,7 +95,7 @@ button {
   line-height: 1.5;
 }
 
-ul {
+.examAvailable ul, .examRegisteredFor ul {
   list-style-type: square;
   margin-bottom: 0px;
 }
