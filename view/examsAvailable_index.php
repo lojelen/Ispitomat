@@ -5,8 +5,8 @@ require_once "view/_navStudent.php"; ?>
 <div id="exams">
 
 <?php
-if (isset($registered))
-  echo "<div class='info'>Uspješno ste se prijavili na ispit ID-a " . $examID . "!</div>";
+/*if (isset($registered))
+  echo "<div class='info'>Uspješno ste se prijavili na ispit ID-a " . $examID . "!</div>";*/
 
 foreach($exams as $exam)
 {
@@ -20,12 +20,15 @@ foreach($exams as $exam)
                date("d.m.Y", strtotime($exam["date"]));
   echo $examInfo; ?>
 
-<form id="registerForm" method="post" action="ispitomat.php?rt=student/register&examID=<?php echo $exam["examID"]; ?>">
+<!--<form id="registerForm" method="post" action="ispitomat.php?rt=student/register&examID=<?php echo $exam["examID"]; ?>">
   <button type="submit" name="register" id="register">Prijavi se</button>
-</form>
-
+</form>-->
+</li></ul><br><button type="submit" class="registerButton" id="register_<?php echo $exam["examID"]; ?>">Prijavi se</button>
+</div>
 <?php } ?>
 
 <div/>
+
+<script src="./scripts/register.js"></script>
 
 <?php require_once "view/_footer.php"; ?>

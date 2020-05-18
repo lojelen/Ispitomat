@@ -5,8 +5,8 @@ require_once "view/_navStudent.php"; ?>
 <div id="exams">
 
 <?php
-if (isset($deregistered))
-  echo "<div class='info'>Uspješno ste se odjavili s ispita ID-a " . $examID . "!</div>";
+/*if (isset($deregistered))
+  echo "<div class='info'>Uspješno ste se odjavili s ispita ID-a " . $examID . "!</div>";*/
 
 foreach($exams as $exam)
 {
@@ -20,12 +20,15 @@ foreach($exams as $exam)
                date("d.m.Y", strtotime($exam["date"]));
   echo $examInfo; ?>
 
-<form id="deregisterForm" method="post" action="ispitomat.php?rt=student/deregister&examID=<?php echo $exam["examID"]; ?>">
+<!--<form id="deregisterForm" method="post" action="ispitomat.php?rt=student/deregister&examID=<?php echo $exam["examID"]; ?>">
   <button type="submit" name="deregister" id="deregister">Odjavi se</button>
-</form>
-
+</form>-->
+</li></ul><br><button type="button" class="deregisterButton" id="deregister_<?php echo $exam["examID"]; ?>">Odjavi se</button>
+</div>
 <?php } ?>
 
 <div/>
+
+<script src="./scripts/deregister.js"></script>
 
 <?php require_once "view/_footer.php"; ?>

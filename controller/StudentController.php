@@ -27,7 +27,7 @@ class StudentController
 		require_once "view/examsTaken_index.php";
 	}
 
-	public function register()
+	/*public function register()
 	{
 		$tus = new Service();
 
@@ -39,7 +39,7 @@ class StudentController
 		$registered = true;
 
 		require_once "view/examsAvailable_index.php";
-	}
+	}*/
 
 	public function examsRegisteredFor()
 	{
@@ -50,7 +50,7 @@ class StudentController
 		require_once "view/examsRegisteredFor_index.php";
 	}
 
-	public function deregister()
+	/*public function deregister()
 	{
 		$tus = new Service();
 
@@ -62,7 +62,7 @@ class StudentController
 		$deregistered = true;
 
 		require_once "view/examsRegisteredFor_index.php";
-	}
+	}*/
 }
 
 ?>
