@@ -1,5 +1,5 @@
-<?php require_once "view/_header.php"; ?>
+<?php require_once "view/_header.php";
 
-<div>Stranica za studenta.</div>
+require_once "view/_navStudent.php";
 
-<?php require_once "view/_footer.php"; ?>
+require_once "view/_footer.php"; ?>

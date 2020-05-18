@@ -59,3 +59,54 @@ body {
 	margin-top: 1px;
 	clear: right;
 }
+
+button {
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  font-size: 12px;
+}
+
+#nav {
+  width: 25%;
+  margin: 10px;
+  border-right: 1px solid #9E9E9E;
+  padding-right: 10px;
+  float: left;
+}
+
+.navElement {
+  margin-bottom: 5px;
+  padding: 8px;
+  background-color: #F5F5F5;
+  box-shadow: 2px 2px #9E9E9E;
+}
+
+.navElement, a {
+  color: black;
+  text-align: center;
+  text-decoration: none;
+}
+
+.examTaken, .examAvailable, .examRegisteredFor {
+  width: 68%;
+  margin-top: 10px;
+  padding: 5px;
+  float: left;
+  background-color: #F5F5F5;
+  line-height: 1.5;
+}
+
+ul {
+  list-style-type: square;
+}
+
+#register, #deregister {
+  width: 100px;
+}
+
+.info {
+  margin: 10px;
+}
+
+.current {
+  background-color: #E9E9E9;
+}
