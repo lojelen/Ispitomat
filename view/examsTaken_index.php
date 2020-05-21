@@ -7,21 +7,33 @@ require_once "view/_navStudent.php"; ?>
 <?php
 foreach($examsData as $examData)
 {
-  $examInfo = "<div class='examTaken'><ul><li><b>Datum ispita:</b> " . date("d.m.Y", strtotime($examData["exam"]->date)) .
-              "</li><li><b>Šifra predmeta:</b> " . $examData["subject"]->subjectID . "</li><li><b>Naziv predmeta:</b> " .
-              $examData["subject"]->subjectName . "</li><li><b>Semestar:</b> ";
+  echo "<div class='examTaken'><h3 class='examHeader'>" . $examData["subject"]->subjectName . " (šifra: " . $examData["subject"]->subjectID . ")</h3><hr>";
+  $examInfo = "<ul><li><b>Akademska godina:</b> " . $examData["exam"]->schoolYear . "</li><li><b>Semestar:</b> ";
   if (strcmp($examData["subject"]->semester, "Z") === 0)
-    $examInfo = $examInfo . "zimski</li><li><b>Ispit položen:</b> ";
+    $examInfo = $examInfo . "zimski</li>";
   else
-    $examInfo = $examInfo . "ljetni</li><li><b>Ispit položen:</b> ";
-  if ($examData["passed"])
-    $examInfo = $examInfo . "DA";
-  else
-    $examInfo = $examInfo . "NE";
-  $examInfo = $examInfo . "</li><li><b>Broj bodova:</b> " . $examData["score"] . "</li>";
-  if ($examData["grade"] !== null)
-    $examInfo = $examInfo . "<li><b>Ocjena:</b> " . $examData["grade"] . "</li>";
-  $examInfo = $examInfo . "<li><b>Prosječan broj bodova:</b> " . round($examData["avgScore"], 3) . "</li></ul></div>";
+    $examInfo = $examInfo . "ljetni</li>";
+  $examInfo = $examInfo . "<li><b>Datum ispita:</b> " . date("d.m.Y", strtotime($examData["exam"]->date)) .
+              "</li><li><b>Vrsta ispita:</b> " . (strcmp($examData["exam"]->type, "written") === 0 ? "pismeni" : "usmeni") . "</li>";
+
+  if (strcmp($examData["type"], "pismeni") === 0)
+    $examInfo = $examInfo . "<li><b>Maksimalan broj bodova:</b> " . $examData["exam"]->maxScore . "</li>";
+
+  if (isset($examData["examTaken"])) {
+    if ($examData["examTaken"]->passed)
+      $examInfo = $examInfo . "<li><b>Ispit položen:</b> DA";
+    else
+      $examInfo = $examInfo . "<li><b>Ispit položen:</b> NE";
+    $examInfo = $examInfo . "</li><li><b>Broj bodova:</b> " . $examData["examTaken"]->score . "</li><li><b>Maksimalan mogući broj bodova:</b> " .
+                $examData["exam"]->maxScore . "</li>";
+    if ($examData["examTaken"]->grade !== null)
+      $examInfo = $examInfo . "<li><b>Ocjena:</b> " . $examData["examTaken"]->grade . "</li>";
+    $examInfo = $examInfo . "<li><b>Prosječan broj bodova:</b> " . round($examData["avgScore"], 3) . "</li></ul></div>";
+  }
+  else {
+    $examInfo = $examInfo . "<li><b>Rezultati ispita:</b> nepoznati</li></ul></div>";
+  }
+
   echo $examInfo;
 } ?>
 

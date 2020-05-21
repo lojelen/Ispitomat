@@ -47,6 +47,13 @@ class Subject
 	protected $semester;
 
   /**
+  * @var boolean
+  *
+  * @OGM\Property(type="boolean")
+  */
+  protected $oralExam;
+
+  /**
   * @var Collection
   *
   * @OGM\Relationship(relationshipEntity="StudentSubject", type="ENROLLED_IN", direction="INCOMING", collection=true, mappedBy="subject")

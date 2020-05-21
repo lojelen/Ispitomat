@@ -12,7 +12,7 @@ $(document).ready(function()
       dataType: "json",
       success: function(data)
       {
-        $("#exams").prepend("<div class='info'>Uspješno ste se odjavili s ispit ID-a " + examID + "!</div>");
+        $("#exams").prepend("<div class='info'>Uspješno ste se odjavili s ispita ID-a " + examID + "!</div>");
         parent.remove();
       }
     });

@@ -48,29 +48,54 @@ class Service
 		try
 		{
 			$em = DB::getConnection();
-			$query = $em->createQuery("MATCH (st:Student)-[t:TAKES]->(e:Exam)-[:IN]->(s:Subject)
+			/*$query = $em->createQuery("MATCH (st:Student)-[t:TAKES]->(e:Exam)-[:IN]->(s:Subject)
 																 WHERE st.userID={userID}
 																 WITH t, e, s
 																 MATCH (:Student)-[tOthers:TAKES]->(eOthers:Exam)
 																 WHERE ID(eOthers)=ID(e)
-																 RETURN t, e, s, AVG(tOthers.score) as avgScore");
-			$query->addEntityMapping("e", \Ispitomat\Exam::class)
-						->addEntityMapping("s", \Ispitomat\Subject::class);
-			$query->setParameter("userID", $userID);
-			$results = $query->execute();
+																 RETURN t, e, s, AVG(tOthers.score) as avgScore");*/
+			$studentsRepository = $em->getRepository(\Ispitomat\Student::class);
+			$student = $studentsRepository->findOneBy(["userID" => $userID]);
 		}
 		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
-		$arr = array();
-		foreach ($results as $row) {
-			if (!$row["t"]->get("passed"))
-				$grade = null;
-			else
-				$grade = $row["t"]->get("grade");
-			$arr[] = ["passed" => $row["t"]->get("passed"), "score" => $row["t"]->get("score"), "grade" => $grade,
-								"exam" => $row["e"], "subject" => $row["s"], "avgScore" => $row["avgScore"]];
+		$examsData = array();
+		$examsTaken = $student->examsTaken;
+		$examsRegisteredFor = $student->examsRegisteredFor;
+		foreach ($examsTaken as $examTaken) {
+			$avgScore = 0;
+			$cnt = 0;
+			$students = array();
+			foreach ($examTaken->exam->studentsTakenBy as $et) {
+				if (!isset($students[$et->student->userID])) {
+					$cnt += 1;
+					$avgScore += $et->score;
+					$students[$et->student->userID] = true;
+				}
+			}
+			$examsData[] = ["examTaken" => $examTaken, "exam" => $examTaken->exam, "subject" => $examTaken->exam->subject[0],
+											"avgScore" => $avgScore / $cnt];
 		}
-		return $arr;
+		foreach ($examsRegisteredFor as $examRegisteredFor) {
+			date_default_timezone_set("Europe/Zagreb");
+			$d1 = date("Y-m-d", strtotime($examRegisteredFor->date));
+			$d2 = date("Y-m-d");
+			if (strcmp($examRegisteredFor->type, "written") === 0) {
+				$t1 = substr($examRegisteredFor->time, 0, 5);
+				$t2 = date("H:i", time());
+				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2)) + $examRegisteredFor->duration;
+				$t2 = intval(substr($t2, 0, 2)) * 60 + intval(substr($t2, 3, 2));
+				if ($d1 < $d2 || (strcmp($d1, $d2) === 0 && $t2 >= $t1)) {
+					$examsData[] = ["exam" => $examRegisteredFor, "subject" => $examRegisteredFor->subject[0]];
+				}
+			}
+			else {
+				if ($d1 <= $d2) {
+					$examsData[] = ["exam" => $examRegisteredFor, "subject" => $examRegisteredFor->subject[0]];
+				}
+			}
+		}
+		return $examsData;
 	}
 
 	function getExamsAvailableToStudent($userID)
@@ -78,7 +103,8 @@ class Service
 		try
 		{
 			$em = DB::getConnection();
-			$query = $em->createQuery("MATCH (student:Student {userID:{userID}})-[:ENROLLED_IN]->(subject:Subject)<-[:IN]-(exam:Exam)
+			// Smatramo da se student mora prijaviti za ispit najkasnije dan ranije
+			/*$query = $em->createQuery("MATCH (student:Student {userID:{userID}})-[:ENROLLED_IN]->(subject:Subject)<-[:IN]-(exam:Exam)
 																 WHERE size((student)-[:REGISTERED_FOR]->(:Exam)-[:IN]->(subject))=0
 																 AND size((student)-[:TAKEN {passed:true}]->(:Exam)-[:IN]->(subject))=0
 																 AND date(exam.date)>date()
@@ -86,11 +112,54 @@ class Service
 			$query->addEntityMapping("exam", \Ispitomat\Exam::class)
 						->addEntityMapping("subject", \Ispitomat\Subject::class);
 			$query->setParameter("userID", $userID);
-			$results = $query->execute();
+			$results = $query->execute();*/
+			$studentsRepository = $em->getRepository(\Ispitomat\Student::class);
+			$student = $studentsRepository->findOneBy(["userID" => $userID]);
+			$subjects = $student->subjects;
 		}
 		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
-		return $results;
+		$examsData = array();
+		$d2 = date("Y-m-d");
+		foreach ($subjects as $ss) {
+			$available = 1; // 0 = nisu dostupni ni pismeni ni usmeni, 1 = dostupni su samo pismeni, 2 = dostupni su samo usmeni
+			foreach ($student->examsRegisteredFor as $examRegisteredFor) {
+				if (strcmp($examRegisteredFor->subject[0]->subjectID, $ss->subject->subjectID) === 0) {
+					$available = 0;
+					break;
+				}
+			}
+			if ($available === 0)
+				continue;
+			foreach ($student->examsTaken as $et) {
+				if (strcmp($et->exam->subject[0]->subjectID, $ss->subject->subjectID) === 0) {
+					if (strcmp($et->exam->type, "oral") === 0 && $et->passed) {
+						$available = 0;
+						break;
+					}
+					else if (strcmp($et->exam->type, "written") === 0 && $et->passed && !$et->exam->subject[0]->oralExam) {
+						$available = 0;
+						break;
+					}
+					else if (strcmp($et->exam->type, "written") === 0 && $et->passed && $et->exam->subject[0]->oralExam) {
+						$available = 2;
+					}
+				}
+			}
+			if ($available === 0)
+				continue;
+			foreach ($ss->subject->exams as $exam) {
+				$d1 = date("Y-m-d", strtotime($exam->date));
+				if ($d1 > $d2) {
+					if ($available === 1 && strcmp($exam->type, "written") === 0)
+						$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+					else if ($available === 2 && strcmp($exam->type, "oral") === 0)
+						$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+				}
+			}
+		}
+		//return $results;
+		return $examsData;
 	}
 
 	function registerStudentForExam($userID, $examID)
@@ -121,7 +190,27 @@ class Service
 		}
 		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
-		return $student->examsRegisteredFor;
+		$exams = array();
+		foreach ($student->examsRegisteredFor as $examRegisteredFor) {
+			date_default_timezone_set("Europe/Zagreb");
+			$d1 = date("Y-m-d", strtotime($examRegisteredFor->date));
+			$d2 = date("Y-m-d");
+			if (strcmp($examRegisteredFor->type, "written") === 0) {
+				$t1 = substr($examRegisteredFor->time, 0, 5);
+				$t2 = date("H:i", time());
+				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2)) + $examRegisteredFor->duration;
+				$t2 = intval(substr($t2, 0, 2)) * 60 + intval(substr($t2, 3, 2));
+				// Prijavljenim pismenim ispitima smatramo one čiji je datum održavanja kasniji od trenutnog datuma ili
+				// je jednak trenutnome, ali je vrijeme završetka ispita (početak + trajanje) manje od trenutnog vremena
+				if ($d1 > $d2 || (strcmp($d1, $d2) === 0 && $t2 < $t1))
+					$exams[] = ["exam" => $examRegisteredFor, "deregister" => ($d1 > $d2)];
+			}
+			else {
+				if ($d1 > $d2)
+					$exams[] = ["exam" => $examRegisteredFor, "deregister" => true];
+			}
+		}
+		return $exams;
 	}
 
 	function deregisterStudentForExam($userID, $examID)

@@ -87,17 +87,18 @@ button {
 }
 
 .examTaken, .examAvailable, .examRegisteredFor {
-  width: 68%;
+  width: 69%;
   margin-top: 10px;
+  margin-right: 6px;
   padding: 5px;
-  float: left;
+  float: right;
   background-color: #F5F5F5;
   line-height: 1.5;
+  border-radius: 15px;
 }
 
-.examAvailable ul, .examRegisteredFor ul {
+.examTaken ul, .examAvailable ul, .examRegisteredFor ul {
   list-style-type: square;
-  margin-bottom: 0px;
 }
 
 .registerButton, .deregisterButton {
@@ -106,8 +107,14 @@ button {
 }
 
 #welcome {
+  width: 70%;
+  float: right;
   margin-top: 10px;
+  margin-right: 6px;
   text-align: center;
+  background-color: #F5F5F5;
+  border-radius: 15px;
+  box-shadow: 2px 2px #9E9E9E;
 }
 
 .ispitomat {
@@ -120,4 +127,16 @@ button {
 
 .current {
   background-color: #E9E9E9;
+}
+
+.examHeader {
+  margin-left: 10px;
+  margin-bottom: 0px;
+  margin-top: 5px;
+  color: #5D4D76;
+}
+
+hr {
+  margin-left: -5px;
+  margin-right: -5px;
 }
