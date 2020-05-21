@@ -1,5 +1,6 @@
 $(document).ready(function()
 {
+  console.log("HEJ");
   $(".registerButton").on("click", function(event)
 	{
     var examID = $(this).prop("id").substring(9);

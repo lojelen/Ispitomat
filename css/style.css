@@ -105,6 +105,15 @@ button {
   margin-left: 20px;
 }
 
+#welcome {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.ispitomat {
+  font-family: "Atomic Age";
+}
+
 .info {
   margin: 10px;
 }

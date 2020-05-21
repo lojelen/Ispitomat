@@ -5,37 +5,41 @@ require_once "user.class.php";
 require_once "teacher.class.php";
 require_once "student.class.php";
 require_once "subject.class.php";
+require_once "exam.class.php";
+require_once "examtaken.class.php";
+require_once "studentsubject.class.php";
+require_once "subjectteaching.class.php";
+use Ispitomat\User;
+use Ispitomat\Teacher;
+use Ispitomat\Student;
+use Ispitomat\Subject;
+use Ispitomat\Exam;
+use Ispitomat\ExamTaken;
+use Ispitomat\StudentSubject;
+use Ispitomat\SubjectTeaching;
 
 class Service
 {
-	function getUserByUserID($userID)
+	function getUserTypeByUserID($userID)
 	{
-		// implementacija dohvaćanja korisnika s danim userIDjem iz baze
-		// funkcija vraća odgovarajući Teacher ili Student objekt
-		echo $userID;
+		// funkcija na temelju userIDja vraća string Teacher ili Student, ovisno o tome je li korisnik s danim userIDjem nastavnik ili student
+		// (ako korisnik s danim userIDjem)
 		try
 		{
-			$client = DB::getConnection();
-			$query = "MATCH (user:User {userID:'" . $userID . "'}) RETURN user, labels(user) AS labels";
-			$result = $client->run($query)->getRecord();
+			$em = DB::getConnection();
+			$query = $em->createQuery("MATCH (user:User) WHERE user.userID={userID} RETURN labels(user) AS labels");
+			$query->setParameter("userID", $userID);
+			$result = $query->execute()[0];
 		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
-		if ($result === null) // provjeriti vraća li null ako ne postoji
+		if ($result === null)
 			return null;
-		else {
-			$user = $result->value("user");
-			$labels = $result->value("labels");
-			foreach ($labels as $label) {
-				if (strcmp($label, "Teacher") === 0)
-					return new Teacher($user->get("userID"), $user->get("name"), $user->get("surname"),
-														 $user->get("gender"), $user->get("dateOfBirth"), $user->get("address"),
-														 $user->get("oib"), $user->get("title"));
-				else if (strcmp($label, "Student") === 0)
-					return new Student($user->get("userID"), $user->get("name"), $user->get("surname"),
-													 	 $user->get("gender"), $user->get("dateOfBirth"), $user->get("address"),
-													 	 $user->get("jmbag"));
-			}
+		foreach ($result["labels"] as $label) {
+			if (strcmp($label, "Teacher") === 0)
+				return "Teacher";
+			else if (strcmp($label, "Student") === 0)
+				return "Student";
 		}
 	}
 
@@ -43,28 +47,28 @@ class Service
 	{
 		try
 		{
-			$client = DB::getConnection();
-			$query = "MATCH (:Student {userID:'" . $userID . "'})-[t:TAKES]->(e:Exam)-[:IN]->(s:Subject)
-								WITH t, e, s
-								MATCH (:Student)-[tOthers:TAKES]->(:Exam {examID: e.examID})
-								RETURN t, e, s, AVG(tOthers.score) as avgScore";
-			$results = $client->run($query)->getRecords();
+			$em = DB::getConnection();
+			$query = $em->createQuery("MATCH (st:Student)-[t:TAKES]->(e:Exam)-[:IN]->(s:Subject)
+																 WHERE st.userID={userID}
+																 WITH t, e, s
+																 MATCH (:Student)-[tOthers:TAKES]->(eOthers:Exam)
+																 WHERE ID(eOthers)=ID(e)
+																 RETURN t, e, s, AVG(tOthers.score) as avgScore");
+			$query->addEntityMapping("e", \Ispitomat\Exam::class)
+						->addEntityMapping("s", \Ispitomat\Subject::class);
+			$query->setParameter("userID", $userID);
+			$results = $query->execute();
 		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
 		$arr = array();
-		foreach ($results as $result) {
-			$t = $result->value("t");
-			$e = $result->value("e");
-			$s = $result->value("s");
-			$avgScore = $result->value("avgScore");
-			if (!$t->get("passed"))
+		foreach ($results as $row) {
+			if (!$row["t"]->get("passed"))
 				$grade = null;
 			else
-				$grade = $t->get("grade");
-			$arr[] = ["examID" => $e->get("examID"), "date" => $e->get("date"), "subjectID" => $s->get("subjectID"),
-								"subjectName" => $s->get("subjectName"), "semester" => $s->get("semester"), "passed" => $t->get("passed"),
-								"score" => $t->get("score"), "grade" => $grade, "avgScore" => $avgScore];
+				$grade = $row["t"]->get("grade");
+			$arr[] = ["passed" => $row["t"]->get("passed"), "score" => $row["t"]->get("score"), "grade" => $grade,
+								"exam" => $row["e"], "subject" => $row["s"], "avgScore" => $row["avgScore"]];
 		}
 		return $arr;
 	}
@@ -73,158 +77,156 @@ class Service
 	{
 		try
 		{
-			$client = DB::getConnection();
-			$query = "MATCH (student:Student {userID:'" . $userID . "'})-[:ENROLLED_IN]->(subject:Subject)<-[:IN]-(exam:Exam)
-								WHERE size((student)-[:REGISTERED_FOR]->(:Exam)-[:IN]->(subject))=0
-								AND size((student)-[:TAKEN {passed:true}]->(:Exam)-[:IN]->(subject))=0
-								AND date(exam.date)>date()
-								RETURN exam, subject";
-			$results = $client->run($query)->getRecords();
+			$em = DB::getConnection();
+			$query = $em->createQuery("MATCH (student:Student {userID:{userID}})-[:ENROLLED_IN]->(subject:Subject)<-[:IN]-(exam:Exam)
+																 WHERE size((student)-[:REGISTERED_FOR]->(:Exam)-[:IN]->(subject))=0
+																 AND size((student)-[:TAKEN {passed:true}]->(:Exam)-[:IN]->(subject))=0
+																 AND date(exam.date)>date()
+																 RETURN exam, subject");
+			$query->addEntityMapping("exam", \Ispitomat\Exam::class)
+						->addEntityMapping("subject", \Ispitomat\Subject::class);
+			$query->setParameter("userID", $userID);
+			$results = $query->execute();
 		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
-		$arr = array();
-		foreach ($results as $result) {
-			$exam = $result->value("exam");
-			$subject = $result->value("subject");
-			$arr[] = ["subjectID" => $subject->get("subjectID"), "subjectName" => $subject->get("subjectName"), "semester" => $subject->get("semester"),
-								"examID" => $exam->get("examID"), "date" => $exam->get("date")];
-		}
-		return $arr;
+		return $results;
 	}
 
 	function registerStudentForExam($userID, $examID)
 	{
 		try
 		{
-			$client = DB::getConnection();
-			$query = "MATCH (student:Student {userID:'" . $userID . "'}), (exam:Exam {examID:'" . $examID . "'})
-								CREATE (student)-[:REGISTERED_FOR]->(exam)";
-			$client->run($query);
+			$em = DB::getConnection();
+			$studentsRepository = $em->getRepository(\Ispitomat\Student::class);
+			$student = $studentsRepository->findOneBy(["userID" => $userID]);
+
+			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+			$exam = $examsRepository->find($examID);
+
+			$student->examsRegisteredFor->add($exam);
+			$exam->studentsRegistered->add($student);
+			$em->flush();
 		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 	}
 
 	function getExamsStudentIsRegisteredFor($userID)
 	{
 		try
 		{
-			$client = DB::getConnection();
-			$query = "MATCH (student:Student {userID:'" . $userID . "'})-[r:REGISTERED_FOR]->(exam:Exam)-[:IN]->(subject:Subject)
-								WHERE size((student)-[:TAKES]->(exam))=0
-								RETURN exam, subject";
-			$results = $client->run($query)->getRecords();
+			$em = DB::getConnection();
+			$studentsRepository = $em->getRepository(\Ispitomat\Student::class);
+			$student = $studentsRepository->findOneBy(["userID" => $userID]);
 		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
-		$arr = array();
-		foreach ($results as $result) {
-			$exam = $result->value("exam");
-			$subject = $result->value("subject");
-			$arr[] = ["subjectID" => $subject->get("subjectID"), "subjectName" => $subject->get("subjectName"), "semester" => $subject->get("semester"),
-								"examID" => $exam->get("examID"), "date" => $exam->get("date")];
-		}
-		return $arr;
+		return $student->examsRegisteredFor;
 	}
 
 	function deregisterStudentForExam($userID, $examID)
 	{
 		try
 		{
-			$client = DB::getConnection();
-			$query = "MATCH (student:Student {userID:'" . $userID . "'})-[r:REGISTERED_FOR]->(exam:Exam {examID:'" . $examID . "'})
-								DELETE r";
-			$client->run($query);
+			$em = DB::getConnection();
+			$studentsRepository = $em->getRepository(\Ispitomat\Student::class);
+			$student = $studentsRepository->findOneBy(["userID" => $userID]);
+
+			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+			$exam = $examsRepository->find($examID);
+
+			$student->examsRegisteredFor->removeElement($exam);
+			$exam->studentsRegistered->removeElement($student);
+			$em->flush();
 		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 	}
 
 	function getSubjectBySubjectID($subjectID)
-	{
-		// funkcija vraća odgovarajući Subject objekt
-		try
-		{
-			$client = DB::getConnection();
-			$query = "MATCH (subject:Subject {subjectID:'" . $subjectID . "'}) RETURN subject";
-			$result = $client->run($query)->getRecord();
-		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+ 	{
+ 		// funkcija vraća odgovarajući Subject objekt
+ 		try
+ 		{
+ 			$client = DB::getClient();
+ 			$query = "MATCH (subject:Subject {subjectID:'" . $subjectID . "'}) RETURN subject";
+ 			$result = $client->run($query)->getRecord();
+ 		}
+ 		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
 
-		if ($result === null) // provjeriti vraća li null ako ne postoji
-			return null;
-		else {
-			$subject = $result->value("subject");
-			return new Subject($subject->get("subjectID"), $subject->get("subjectName"), $subject->get("year"),
-												 $subject->get("semester"));
-		}
-	}
+ 		if ($result === null) // provjeriti vraća li null ako ne postoji
+ 			return null;
+ 		else {
+ 			$subject = $result->value("subject");
+ 			return Subject::withArgs($subject->get("subjectID"), $subject->get("subjectName"), $subject->get("year"),
+ 												 			 $subject->get("semester"));
+ 		}
+ 	}
 
-	function getSubjectsByUserID($userID)
-	{
-		try
-		{
-			$client = DB::getConnection();
-			$query = "MATCH (p:Teacher {userID:'" . $userID . "'})-[t:TEACHES]->(subject:Subject)
-								RETURN subject";
-			$results = $client->run($query)->getRecords();
-		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+ 	function getSubjectsByUserID($userID)
+ 	{
+ 		try
+ 		{
+ 			$client = DB::getClient();
+ 			$query = "MATCH (p:Teacher {userID:'" . $userID . "'})-[t:TEACHES]->(subject:Subject)
+ 								RETURN subject";
+ 			$results = $client->run($query)->getRecords();
+ 		}
+ 		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
 
-		$arr = array();
-		foreach ($results as $result) {
-			$subject = $result->value("subject");
-			$arr[] = ["subjectID" => $subject->get("subjectID"), "subjectName" => $subject->get("subjectName"), "semester" => $subject->get("semester")];
-		}
-		return $arr;
-	}
+ 		$arr = array();
+ 		foreach ($results as $result) {
+ 			$subject = $result->value("subject");
+ 			$arr[] = ["subjectID" => $subject->get("subjectID"), "subjectName" => $subject->get("subjectName"), "semester" => $subject->get("semester")];
+ 		}
+ 		return $arr;
+ 	}
 
-	function getExamsTakenFromSubject($subjectID)
-	{
-		try
-		{
-			$client = DB::getConnection();
-			$query = "MATCH (s:Subject {subjectID:'" . $subjectID . "'})<-[f:FROM]-(e:Exam)
-								WITH s, f, e
-								MATCH (:Student)-[tOthers:TAKES]->(:Exam {examID: e.examID})
-								RETURN s, f,e, AVG(tOthers.score) as avgScore";
-			$results = $client->run($query)->getRecords();
-		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+ 	function getExamsTakenFromSubject($subjectID)
+ 	{
+ 		try
+ 		{
+ 			$client = DB::getClient();
+ 			$query = "MATCH (s:Subject {subjectID:'" . $subjectID . "'})<-[f:IN]-(e:Exam)
+ 								WITH s, f, e
+ 								MATCH (:Student)-[tOthers:TAKES]->(:Exam {examID: e.examID})
+ 								RETURN s, f,e, AVG(tOthers.score) as avgScore";
+ 			$results = $client->run($query)->getRecords();
+ 		}
+ 		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
 
-		$arr = array();
-		foreach ($results as $result) {
-			$f = $result->value("f");
-			$e = $result->value("e");
-			$s = $result->value("s");
-			$avgScore = $result->value("avgScore");
-			$arr[] = ["examID" => $e->get("examID"), "date" => $e->get("date"), "subjectID" => $s->get("subjectID"),
-								"subjectName" => $s->get("subjectName"), "semester" => $s->get("semester"), "avgScore" => $avgScore];
-		}
-		return $arr;
-	}
+ 		$arr = array();
+ 		foreach ($results as $result) {
+ 			$f = $result->value("f");
+ 			$e = $result->value("e");
+ 			$s = $result->value("s");
+ 			$avgScore = $result->value("avgScore");
+ 			$arr[] = ["examID" => $e->get("examID"), "date" => $e->get("date"), "subjectID" => $s->get("subjectID"),
+ 								"subjectName" => $s->get("subjectName"), "semester" => $s->get("semester"), "avgScore" => $avgScore];
+ 		}
+ 		return $arr;
+ 	}
 
-	function getExamsAvailableFromSubject($subjectID)
-	{
-		try
-		{
-			$client = DB::getConnection();
-			$query = "MATCH (s:Subject {subjectID:'" . $subjectID . "'})<-[f:FROM]-(e:Exam)
-								WHERE date(e.date)>date()
-								RETURN e, s";
-			$results = $client->run($query)->getRecords();
-		}
-		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+ 	function getExamsAvailableFromSubject($subjectID)
+ 	{
+ 		try
+ 		{
+ 			$client = DB::getClient();
+ 			$query = "MATCH (s:Subject {subjectID:'" . $subjectID . "'})<-[f:FROM]-(e:Exam)
+ 								WHERE date(e.date)>date()
+ 								RETURN e, s";
+ 			$results = $client->run($query)->getRecords();
+ 		}
+ 		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
 
-		$arr = array();
-		foreach ($results as $result) {
-			$exam = $result->value("e");
-			$subject = $result->value("s");
-			$arr[] = ["subjectID" => $subject->get("subjectID"), "subjectName" => $subject->get("subjectName"), "semester" => $subject->get("semester"),
-								"examID" => $exam->get("examID"), "date" => $exam->get("date")];
-		}
-		return $arr;
-	}
-
+ 		$arr = array();
+ 		foreach ($results as $result) {
+ 			$exam = $result->value("e");
+ 			$subject = $result->value("s");
+ 			$arr[] = ["subjectID" => $subject->get("subjectID"), "subjectName" => $subject->get("subjectName"), "semester" => $subject->get("semester"),
+ 								"examID" => $exam->get("examID"), "date" => $exam->get("date")];
+ 		}
+ 		return $arr;
+ 	}
 };
 
 ?>

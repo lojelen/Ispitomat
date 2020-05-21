@@ -1,17 +1,41 @@
 <?php
 
-require_once "model/user.class.php";
+namespace Ispitomat;
 
+require_once "model/user.class.php";
+use GraphAware\Neo4j\OGM\Common\Collection;
+
+/**
+ *
+ * @OGM\Node(label="Teacher")
+ */
 class Teacher extends User
 {
-	protected $oib, $title;
+	/**
+  * @var string
+  *
+  * @OGM\Property(type="string")
+  */
+	protected $oib;
 
-	function __construct($userID, $name, $surname, $gender, $dateOfBirth, $address, $oib, $title)
-	{
-		parent::__construct($userID, $name, $surname, $gender, $dateOfBirth, $address);
-		$this->OIB = $oib;
-		$this->title = $title;
-	}
+	/**
+  * @var string
+  *
+  * @OGM\Property(type="string")
+  */
+	protected $title;
+
+	/**
+  * @var Collection
+  *
+  * @OGM\Relationship(relationshipEntity="SubjectTeaching", type="TEACHES", direction="OUTGOING", collection=true, mappedBy="teacher")
+  */
+  protected $subjects;
+
+	public function __construct()
+  {
+      $this->subjects = new Collection();
+  }
 }
 
 ?>

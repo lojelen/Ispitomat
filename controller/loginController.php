@@ -15,14 +15,15 @@ class LoginController
 		$tus = new Service();
 
 		if (isset($_POST["userID"])) {
-			$user = $tus->getUserByUserID($_POST["userID"]);
+			$userID = $_POST["userID"];
+			$userType = $tus->getUserTypeByUserID($_POST["userID"]);
 
-			if ($user === null)
+			if ($userType === null)
 				$message = "Korisnik s tim imenom ne postoji.";
 			else {
-				$_SESSION["userID"] = $user->userID;
+				$_SESSION["userID"] = $userID;
 				// User je nadklasa dviju podklasa: Teacher i Student
-				$_SESSION["type"] = get_class($user);
+				$_SESSION["type"] = $userType;
 				if (strcmp($_SESSION["type"], "Teacher") === 0) {
 					header("Location: ispitomat.php?rt=teacher");
 					exit();
