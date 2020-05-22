@@ -15,7 +15,8 @@ class IndexController
 			exit();
 		} else {
 			// $_SESSION["type"] je string koji može poprimiti dvije vrijednosti: nastavnik/student
-			if (strcmp($_SESSION["type"], "teacher") === 0) {
+
+			if (strcmp($_SESSION["type"], "Teacher") === 0) {
 				// teacher = glavni izbornik za nastavnika
 				header("Location: ispitomat.php?rt=teacher");
 				exit();

@@ -23,7 +23,7 @@ foreach($exams as $exam)
   $examInfo = $examInfo . "<li><b>Lokacija ispita:</b> " . $exam["exam"]->location . "</li></ul>";
   echo $examInfo; ?>
 
-<button type="submit" class="registerButton" id="register_<?php echo $exam["exam"]->neo4jID; ?>">Prijavi se</button>
+<button type="submit" class="registerButton" id="register_<?php echo $exam["exam"]->id; ?>">Prijavi se</button>
 </div>
 <?php } ?>
 <div/>

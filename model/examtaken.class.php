@@ -15,7 +15,7 @@ class ExamTaken
      *
      * @OGM\GraphId()
      */
-    protected $neo4jID;
+    protected $id;
 
     /**
      * @var Student

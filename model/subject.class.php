@@ -16,7 +16,7 @@ class Subject
 	*
   * @OGM\GraphId()
   */
-  protected $neo4jID;
+  protected $id;
 
 	/**
   * @var string

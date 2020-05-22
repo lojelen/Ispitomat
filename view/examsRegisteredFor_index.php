@@ -25,7 +25,7 @@ foreach($exams as $exam)
   echo $examInfo;
 
 if ($exam["deregister"])
-  echo "<button type='submit' class='deregisterButton' id='deregister_" . $exam["exam"]->neo4jID . "'>Odjavi se</button>"
+  echo "<button type='submit' class='deregisterButton' id='deregister_" . $exam["exam"]->id . "'>Odjavi se</button>"
 ?>
 </div>
 <?php } ?>

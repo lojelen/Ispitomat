@@ -5,24 +5,35 @@
  <div id="exams">
 
  <?php
- foreach($exams as $exam)
+ foreach($examsData as $examData)
  {
-   $examInfo = "<div class='examTaken'><ul><li><b>ID ispita:</b> " . $exam["examID"] . "</li><li><b>Datum ispita:</b> " .
-                date("d.m.Y", strtotime($exam["date"])) . "</li><li><b>Šifra predmeta:</b> " .
-                $exam["subjectID"] . "</li><li><b>Naziv predmeta:</b> " . $exam["subjectName"] . "</li><li><b>Semestar:</b> ";
-   if (strcmp($exam["semester"], "Z") === 0)
-     $examInfo = $examInfo . "zimski</li><li><b>Ispit položen:</b> ";
+   echo "<div class='examTaken'>";
+   $examInfo = "<ul><li><b>Akademska godina:</b> " . $examData["exam"]->schoolYear . "</li><li><b>Semestar:</b> ";
+   if (strcmp($examData["subject"]->semester, "Z") === 0)
+     $examInfo = $examInfo . "zimski</li>";
    else
-     $examInfo = $examInfo . "ljetni</li><li><b>Ispit položen:</b> ";
-   $examInfo = $examInfo . "<li><b>Prosječan broj bodova:</b> " . round($exam["avgScore"], 3) . "</li></ul></div>";
-   echo $examInfo;
+     $examInfo = $examInfo . "ljetni</li>";
+   $examInfo = $examInfo . "<li><b>Datum ispita:</b> " . date("d.m.Y", strtotime($examData["exam"]->date)) .
+               "</li><li><b>Vrsta ispita:</b> " . (strcmp($examData["exam"]->type, "written") === 0 ? "pismeni" : "usmeni") . "</li>";
 
+   if (strcmp($examData["exam"]->type, "written") === 0)
+     $examInfo = $examInfo . "<li><b>Maksimalan broj bodova:</b> " . $examData["exam"]->maxScore . "</li>";
+
+   if (isset($examData["examTaken"])) {
+     $examInfo = $examInfo . "<li><b>Prosječan broj bodova:</b> " . round($examData["avgScore"], 3) . "</li></ul></div>";
+   }
+   else {
+     $examInfo = $examInfo . "<li><b>Rezultati ispita:</b> nepoznati</li></ul></div>";
+   }
+   echo $examInfo;
    //Upiši bodove
    ?>
-   <form id="registerForm" method="post" action="ispitomat.php?rt=teacher/evaluate&examID=<?php echo $exam["examID"]; ?>">
-     <button type="submit" name="evaluate" id="evaluate">Upiši bodove</button>
+   <form id="evaluateForm" method="post" action="ispitomat.php?rt=teacher/evaluate&examID=<?php echo $examData["exam"]->id; ?>">
+     <button type="submit" name="evaluateButton" id="evaluate_<?php echo $examData["exam"]->id; ?>">Upiši bodove</button>
    </form>
- <?php } ?>
+  </div>
+ <?php
+ } ?>
 
  <div/>
 

@@ -6,22 +6,25 @@
 
  <?php
 
+
  foreach($exams as $exam)
  {
-   $examInfo = "<div class='examAvailable'><ul><li><b>Šifra predmeta:</b> " . $exam["subjectID"] . "</li><li><b>Naziv predmeta:</b> " .
-                $exam["subjectName"] . "</li><li><b>Semestar:</b> ";
-   if (strcmp($exam["semester"], "Z") === 0)
-     $examInfo = $examInfo . "zimski";
-   else
-     $examInfo = $examInfo . "ljetni";
-   $examInfo = $examInfo . "</li><li><b>ID ispita:</b> " . $exam["examID"] . "</li><li><b>Datum ispita:</b> " .
-                date("d.m.Y", strtotime($exam["date"]));
+   echo "<div class='examAvailable'>";
+   $examInfo = "<ul><li><b>Datum ispita:</b> " . date("d.m.Y", strtotime($exam["exam"]->date)) .
+               "</li><li><b>Vrsta ispita:</b> " . (strcmp($exam["exam"]->type, "written") === 0 ? "pismeni" : "usmeni") . "</li>";
+   if (strcmp($exam["exam"]->type, "written") === 0) {
+     $examInfo = $examInfo . "<li><b>Vrijeme ispita:</b> " . $exam["exam"]->time . "</li><li><b>Trajanje ispita: </b>" .
+                 $exam["exam"]->duration . " min</li>";
+   }
+   $examInfo = $examInfo . "<li><b>Lokacija ispita:</b> " . $exam["exam"]->location . "</li>";
+   $examInfo = $examInfo . "<li><b>Maksimalan broj bodova:</b> " . $exam["exam"]->maxScore . "</li></ul>";
    echo $examInfo; ?>
 
- </li></ul><br><button type="submit" class="editButton" id="edit_<?php echo $exam["examID"]; ?>">Uredi</button>
+ <form id="evaluateForm" method="post" action="ispitomat.php?rt=teacher/edit&examID=<?php echo $exam["exam"]->id; ?>">
+   <button type="submit" class="editButton" id="edit_<?php echo $exam["exam"]->id; ?>">Uredi</button>
+ </form>
  </div>
  <?php } ?>
-
  <div/>
 
  <?php require_once "view/_footer.php"; ?>

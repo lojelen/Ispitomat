@@ -1,8 +1,9 @@
 <?php require_once "view/_header.php";
 
+require_once "view/_navSubject.php";
+
  if (strcmp($errorMsg, "OK") === 0) {
- 	echo "<div id='errorMsg'>Akcija je uspjela!<br>";
- 	echo "<a href='ispitomat.php?rt=teacher'>Odvedi me natrag!</a></div>";
+ 	echo "<div id='errorMsg'>Akcija je uspjela!</div><br>";
  }
 
  else if (strcmp($errorMsg, "NOT_SET") === 0)

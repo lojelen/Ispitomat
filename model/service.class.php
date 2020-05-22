@@ -131,8 +131,6 @@ class Service
 			}
 			if ($available === 0)
 				continue;
-			$timesFailedWritten = 0;
-			$timesFailedOral = 0;
 			foreach ($student->examsTaken as $et) {
 				if (strcmp($et->exam->subject[0]->subjectID, $ss->subject->subjectID) === 0) {
 					if (strcmp($et->exam->type, "oral") === 0 && $et->passed) {
@@ -146,20 +144,9 @@ class Service
 					else if (strcmp($et->exam->type, "written") === 0 && $et->passed && $et->exam->subject[0]->oralExam) {
 						$available = 2;
 					}
-					else if (strcmp($et->exam->type, "written") === 0 && !$et->passed) {
-						$timesFailedWritten += 1;
-					}
-					else if (strcmp($et->exam->type, "oral") === 0 && !$et->passed) {
-						$timesFailedOral += 1;
-					}
 				}
 			}
 			if ($available === 0)
-				continue;
-			// Pretpostavljamo da se ispit može polagati najviše 4 puta
-			else if ($available === 1 && $timesFailedWritten >= 4)
-				continue;
-			else if ($available === 2 && $timesFailedOral >= 4)
 				continue;
 			foreach ($ss->subject->exams as $exam) {
 				$d1 = date("Y-m-d", strtotime($exam->date));
@@ -285,50 +272,178 @@ class Service
 
  	function getExamsTakenFromSubject($subjectID)
  	{
- 		try
- 		{
- 			$client = DB::getClient();
- 			$query = "MATCH (s:Subject {subjectID:'" . $subjectID . "'})<-[f:IN]-(e:Exam)
- 								WITH s, f, e
- 								MATCH (:Student)-[tOthers:TAKES]->(:Exam {examID: e.examID})
- 								RETURN s, f,e, AVG(tOthers.score) as avgScore";
- 			$results = $client->run($query)->getRecords();
- 		}
- 		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+		try
+		{
+			$em = DB::getConnection();
 
- 		$arr = array();
- 		foreach ($results as $result) {
- 			$f = $result->value("f");
- 			$e = $result->value("e");
- 			$s = $result->value("s");
- 			$avgScore = $result->value("avgScore");
- 			$arr[] = ["examID" => $e->get("examID"), "date" => $e->get("date"), "subjectID" => $s->get("subjectID"),
- 								"subjectName" => $s->get("subjectName"), "semester" => $s->get("semester"), "avgScore" => $avgScore];
- 		}
- 		return $arr;
+			$subjectRepository = $em->getRepository(\Ispitomat\Subject::class);
+			$subject = $subjectRepository->findOneBy(["subjectID" => $subjectID]);
+		}
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
+
+		$examsData = array();
+		$exams = $subject->exams;
+
+		foreach ($exams as $exam) {
+			date_default_timezone_set("Europe/Zagreb");
+			$d1 = date("Y-m-d", strtotime($exam->date));
+			$d2 = date("Y-m-d");
+			if (strcmp($exam->type, "written") === 0) {
+				$t1 = substr($exam->time, 0, 5);
+				$t2 = date("H:i", time());
+				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2)) + $exam->duration;
+				$t2 = intval(substr($t2, 0, 2)) * 60 + intval(substr($t2, 3, 2));
+				if ($d1 < $d2 || (strcmp($d1, $d2) === 0 && $t2 >= $t1)) {
+					$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+				}
+			}
+			else {
+				if ($d1 <= $d2) {
+					$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+				}
+			}
+		}
+
+		return $examsData;
  	}
 
  	function getExamsAvailableFromSubject($subjectID)
  	{
- 		try
- 		{
- 			$client = DB::getClient();
- 			$query = "MATCH (s:Subject {subjectID:'" . $subjectID . "'})<-[f:FROM]-(e:Exam)
- 								WHERE date(e.date)>date()
- 								RETURN e, s";
- 			$results = $client->run($query)->getRecords();
- 		}
- 		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+		try
+		{
+			$em = DB::getConnection();
+			$query = $em->createQuery("MATCH (subject:Subject {subjectID:{subjectID}})<-[:IN]-(exam:Exam)
+																 WHERE date(exam.date)>date()
+																 RETURN exam, subject");
+			$query->addEntityMapping("exam", \Ispitomat\Exam::class)
+						->addEntityMapping("subject", \Ispitomat\Subject::class);
+			$query->setParameter("subjectID", $subjectID);
+			$results = $query->execute();
+		}
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
- 		$arr = array();
- 		foreach ($results as $result) {
- 			$exam = $result->value("e");
- 			$subject = $result->value("s");
- 			$arr[] = ["subjectID" => $subject->get("subjectID"), "subjectName" => $subject->get("subjectName"), "semester" => $subject->get("semester"),
- 								"examID" => $exam->get("examID"), "date" => $exam->get("date")];
- 		}
- 		return $arr;
+		return $results;
  	}
+
+	function insertWrittenExam($subjectID, $date, $time, $duration, $location, $max)
+	{
+		try
+		{
+			$em = DB::getConnection();
+			$exam = new Exam();
+
+			$exam->__set("date",$date);
+			$exam->__set("type","written");
+			$exam->__set("time",$time);
+			$exam->__set("duration",$duration);
+			$exam->__set("location",$location);
+			$exam->__set("maxScore",$max);
+			$exam->__set("schoolYear","2019./20.");
+
+			$em->persist($exam);
+
+			$em->flush();
+
+			$subjectRepository = $em->getRepository(\Ispitomat\Subject::class);
+			$subject = $subjectRepository->findOneBy(["subjectID" => $subjectID]);
+
+			$subject->exams->add($exam);
+			$exam->subject->add($subject);
+			$em->flush();
+
+		}
+		catch(Exception $e) { return "Error " . $e->getMessage(); }
+
+		return "OK";
+
+	}
+
+	function insertOralExam($subjectID, $date, $location, $max)
+	{
+		try {
+			$em = DB::getConnection();
+			$exam = new Exam();
+
+			$exam->__set("date",$date);
+			$exam->__set("type","oral");
+			$exam->__set("location",$location);
+			$exam->__set("maxScore",$max);
+			$exam->__set("schoolYear","2019./20.");
+
+			$em->persist($exam);
+
+			$em->flush();
+
+			$subjectRepository = $em->getRepository(\Ispitomat\Subject::class);
+			$subject = $subjectRepository->findOneBy(["subjectID" => $subjectID]);
+
+			$subject->exams->add($exam);
+			$exam->subject->add($subject);
+			$em->flush();
+
+		}
+		catch(Exception $e) { return "Error " . $e->getMessage(); }
+
+		return "OK";
+
+	}
+
+	function editExam($id, $location, $max)
+	{
+		try {
+			$em = DB::getConnection();
+
+
+			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+			$exam = $examsRepository->find($id);
+
+			$exam->__set("location",$location);
+			$exam->__set("maxScore",$max);
+
+			$em->flush();
+
+		}
+		catch(Exception $e) { return "Error " . $e->getMessage(); }
+
+		return "OK";
+
+	}
+
+	function getExamByExamID($examID)
+	{
+		try {
+			$em = DB::getConnection();
+
+			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+			$exam = $examsRepository->find($examID);
+
+			$em->flush();
+		}
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
+
+		return $exam;
+
+	}
+
+	function getStudentsByExamID($examID)
+	{
+		try {
+			$em = DB::getConnection();
+
+			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+			$exam = $examsRepository->find($examID);
+
+		}
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
+
+		$data = array();
+		$students = $exam->studentsRegistered;
+		foreach ($students as $student) {
+			$data[] = ["exam" => $exam, "student" => $student];
+		}
+
+		return $data;
+	}
 };
 
 ?>
