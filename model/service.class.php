@@ -131,6 +131,8 @@ class Service
 			}
 			if ($available === 0)
 				continue;
+			$timesFailedWritten = 0;
+			$timesFailedOral = 0;
 			foreach ($student->examsTaken as $et) {
 				if (strcmp($et->exam->subject[0]->subjectID, $ss->subject->subjectID) === 0) {
 					if (strcmp($et->exam->type, "oral") === 0 && $et->passed) {
@@ -144,9 +146,20 @@ class Service
 					else if (strcmp($et->exam->type, "written") === 0 && $et->passed && $et->exam->subject[0]->oralExam) {
 						$available = 2;
 					}
+					else if (strcmp($et->exam->type, "written") === 0 && !$et->passed) {
+						$timesFailedWritten += 1;
+					}
+					else if (strcmp($et->exam->type, "oral") === 0 && !$et->passed) {
+						$timesFailedOral += 1;
+					}
 				}
 			}
 			if ($available === 0)
+				continue;
+			// Pretpostavljamo da se ispit može polagati najviše 4 puta
+			else if ($available === 1 && $timesFailedWritten >= 4)
+				continue;
+			else if ($available === 2 && $timesFailedOral >= 4)
 				continue;
 			foreach ($ss->subject->exams as $exam) {
 				$d1 = date("Y-m-d", strtotime($exam->date));
