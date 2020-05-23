@@ -231,26 +231,6 @@ class Service
 		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 	}
 
-	function getSubjectBySubjectID($subjectID)
- 	{
- 		// funkcija vraća odgovarajući Subject objekt
- 		try
- 		{
- 			$client = DB::getClient();
- 			$query = "MATCH (subject:Subject {subjectID:'" . $subjectID . "'}) RETURN subject";
- 			$result = $client->run($query)->getRecord();
- 		}
- 		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
-
- 		if ($result === null) // provjeriti vraća li null ako ne postoji
- 			return null;
- 		else {
- 			$subject = $result->value("subject");
- 			return Subject::withArgs($subject->get("subjectID"), $subject->get("subjectName"), $subject->get("year"),
- 												 			 $subject->get("semester"));
- 		}
- 	}
-
  	function getSubjectsByUserID($userID)
  	{
  		try
@@ -285,21 +265,36 @@ class Service
 		$exams = $subject->exams;
 
 		foreach ($exams as $exam) {
-			date_default_timezone_set("Europe/Zagreb");
-			$d1 = date("Y-m-d", strtotime($exam->date));
-			$d2 = date("Y-m-d");
-			if (strcmp($exam->type, "written") === 0) {
-				$t1 = substr($exam->time, 0, 5);
-				$t2 = date("H:i", time());
-				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2)) + $exam->duration;
-				$t2 = intval(substr($t2, 0, 2)) * 60 + intval(substr($t2, 3, 2));
-				if ($d1 < $d2 || (strcmp($d1, $d2) === 0 && $t2 >= $t1)) {
-					$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+			if(!$exam->studentsTakenBy->isEmpty()){
+				$cnt = 0;
+				$avgScore = 0;
+				$students = array();
+				foreach ($exam->studentsTakenBy as $et) {
+					if (!isset($students[$et->student->userID])) {
+						$cnt += 1;
+						$avgScore += $et->score;
+						$students[$et->student->userID] = true;
+					}
 				}
+				$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0],"avgScore" => $avgScore / $cnt];
 			}
 			else {
-				if ($d1 <= $d2) {
-					$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+				date_default_timezone_set("Europe/Zagreb");
+				$d1 = date("Y-m-d", strtotime($exam->date));
+				$d2 = date("Y-m-d");
+				if (strcmp($exam->type, "written") === 0) {
+					$t1 = substr($exam->time, 0, 5);
+					$t2 = date("H:i", time());
+					$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2)) + $exam->duration;
+					$t2 = intval(substr($t2, 0, 2)) * 60 + intval(substr($t2, 3, 2));
+					if ($d1 < $d2 || (strcmp($d1, $d2) === 0 && $t2 >= $t1)) {
+						$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+					}
+				}
+				else {
+					if ($d1 <= $d2) {
+						$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+					}
 				}
 			}
 		}
@@ -340,6 +335,20 @@ class Service
 			$exam->__set("maxScore",$max);
 			$exam->__set("schoolYear","2019./20.");
 
+			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+			$exams = $examsRepository->findBy(["date" => $date, "location" => $location]);
+
+			foreach ($exams as $e) {
+				$t1 = substr($e->time, 0, 5);
+				$t2 = substr($exam->time, 0, 5);
+				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2));
+				$t2 = intval(substr($t2, 0, 2)) * 60 + intval(substr($t2, 3, 2));
+				if ($t2 >= $t1 && $t2 <= $t1  + $e->duration) {
+					$em->flush();
+					return "Postoji ispit u tom terminu na toj lokaciji.";
+				}
+			}
+
 			$em->persist($exam);
 
 			$em->flush();
@@ -350,7 +359,6 @@ class Service
 			$subject->exams->add($exam);
 			$exam->subject->add($subject);
 			$em->flush();
-
 		}
 		catch(Exception $e) { return "Error " . $e->getMessage(); }
 
@@ -397,6 +405,19 @@ class Service
 			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
 			$exam = $examsRepository->find($id);
 
+			$exams = $examsRepository->findBy(["date" => $xam->date, "location" => $location]);
+
+			foreach ($exams as $e) {
+				$t1 = substr($e->time, 0, 5);
+				$t2 = substr($exam->time, 0, 5);
+				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2));
+				$t2 = intval(substr($t2, 0, 2)) * 60 + intval(substr($t2, 3, 2));
+				if ($t2 >= $t1 && $t2 <= $t1  + $e->duration) {
+					$em->flush();
+					return "Postoji ispit u tom terminu na toj lokaciji.";
+				}
+			}
+
 			$exam->__set("location",$location);
 			$exam->__set("maxScore",$max);
 
@@ -407,6 +428,22 @@ class Service
 
 		return "OK";
 
+	}
+
+	function getSubjectBySubjectID($subjectID)
+	{
+		// funkcija vraća odgovarajući Subject objekt
+		try {
+			$em = DB::getConnection();
+
+			$subjectRepository = $em->getRepository(\Ispitomat\Subject::class);
+			$subject = $subjectRepository->findOneBy(["subjectID" => $subjectID]);
+
+			$em->flush();
+		}
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
+
+		return $subject;
 	}
 
 	function getExamByExamID($examID)
@@ -438,11 +475,42 @@ class Service
 
 		$data = array();
 		$students = $exam->studentsRegistered;
+		$subject = $exam->subject[0];
 		foreach ($students as $student) {
-			$data[] = ["exam" => $exam, "student" => $student];
+			$data[] = [ "subject" => $subject,"exam" => $exam, "student" => $student];
 		}
 
 		return $data;
+	}
+
+	function setStudentsScoreOfExam($examID, array $passed, array $score, array $grade)
+	{
+		try {
+			$em = DB::getConnection();
+
+			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+			$exam = $examsRepository->find($examID);
+
+			foreach ($passed as $jmbag => $value) {
+
+				$student = $em->getRepository(\Ispitomat\Student::class)->findOneBy(["jmbag" => (string) $jmbag]);
+
+				$et = new ExamTaken($student, $exam, $value, (float) $score[$jmbag], $grade[$jmbag]);
+
+				$student->examsRegisteredFor->removeElement($exam);
+				$exam->studentsRegistered->removeElement($student);
+
+				$student->examsTaken->add($et);
+				$exam->studentsTakenBy->add($et);
+			}
+
+			$em->flush();
+
+		}
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
+
+		return "OK";
+
 	}
 };
 

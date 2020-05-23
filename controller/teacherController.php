@@ -108,17 +108,40 @@ class TeacherController
 		require_once "view/T_examsTaken_evaluate.php";
 	}
 
-	public function evaluateExamInput()
+	public function save()
 	{
-		// Funkcija pomoću koje pokrećemo ubacivanje podataka o novom ispitu
-		$tus = new Service();
+		// Funkcija pomoću koje pokrećemo ubacivanje povratne informacije studentima
 
 		$errorMsg = "NOT_SET";
 
-		if (isset($_POST["location"]) && isset($_POST["max"]) &&
-		(strcmp($_POST["location"], "") !== 0)) {
-			$retVal = $tus->editExam($_POST["id"], $_POST["location"], $_POST["max"]);
-			$errorMsg = $retVal; // Poruka koja se ispisuje ako je nešto pošlo po zlu prilikom ubacivanja podataka u bazu
+		$score = array();
+		$passed = array();
+		$grade = array();
+
+		if(isset($_POST["jmbag"])){
+				$jmbag = $_POST["jmbag"];
+
+				foreach ($jmbag as $j) {
+					if (isset($_POST["score_".$j]) && isset($_POST["passed_".$j])){
+						if (isset($_POST["grade_".$j])) $g = $_POST["grade_".$j];
+						else $g = null;
+
+						if (strcmp($_POST["passed_".$j],"DA") === 0) $p = true;
+						else $p = false;
+
+						$score = [ $j =>$_POST["score_".$j]];
+						$passed = [ $j => $p];
+						$grade = [ $j => $g];
+					}
+				}
+
+				$tus = new Service();
+
+				$retVal = $tus->setStudentsScoreOfExam($_GET["examID"], $passed, $score, $grade);
+				$errorMsg = $retVal;
+		}
+		else{
+			$errorMsg = "Svi bodovi su već uneseni.";
 		}
 
 		require_once "view/T_addExam.php";

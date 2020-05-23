@@ -54,7 +54,7 @@ class ExamTaken
 
     public function __construct(Student $student, Exam $exam, bool $passed, float $score, int $grade=null)
     {
-        $this->student = $teacher;
+        $this->student = $student;
         $this->exam = $exam;
         $this->passed = $passed;
         $this->score = $score;

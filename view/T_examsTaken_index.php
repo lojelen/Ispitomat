@@ -19,7 +19,7 @@
    if (strcmp($examData["exam"]->type, "written") === 0)
      $examInfo = $examInfo . "<li><b>Maksimalan broj bodova:</b> " . $examData["exam"]->maxScore . "</li>";
 
-   if (isset($examData["examTaken"])) {
+   if (isset($examData["avgScore"])) {
      $examInfo = $examInfo . "<li><b>Prosječan broj bodova:</b> " . round($examData["avgScore"], 3) . "</li></ul></div>";
    }
    else {
