@@ -106,7 +106,7 @@ button {
   margin-left: 20px;
 }
 
-.addButton, .editButton, .evaluateButton, .saveButton {
+.addButton, .editButton, .evaluateButton, .saveButton, .reviewButton {
    width: 100px;
    margin-right: 20px;
    float: right;
