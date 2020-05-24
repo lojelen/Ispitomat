@@ -356,7 +356,7 @@ class Service
  						$students[$et->student->userID] = true;
  					}
  				}
- 				$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0],"avgScore" => $avgScore / $cnt];
+ 				$examsData[] = ["exam" => $exam, "date" => $exam->date, "subject" => $exam->subject[0],"avgScore" => $avgScore / $cnt];
  			}
  			else {
 				date_default_timezone_set("Europe/Zagreb");
@@ -368,12 +368,12 @@ class Service
  					$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2)) + $exam->duration;
  					$t2 = intval(substr($t2, 0, 2)) * 60 + intval(substr($t2, 3, 2));
  					if ($d1 < $d2 || (strcmp($d1, $d2) === 0 && $t2 >= $t1)) {
- 						$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+ 						$examsData[] = ["exam" => $exam, "date" => $exam->date, "subject" => $exam->subject[0]];
  					}
  				}
  				else {
  					if ($d1 <= $d2) {
- 						$examsData[] = ["exam" => $exam, "subject" => $exam->subject[0]];
+ 						$examsData[] = ["exam" => $exam, "date" => $exam->date, "subject" => $exam->subject[0]];
  					}
  				}
  			}
@@ -388,7 +388,7 @@ class Service
  			$em = DB::getConnection();
  			$query = $em->createQuery("MATCH (subject:Subject {subjectID:{subjectID}})<-[:IN]-(exam:Exam)
  																 WHERE date(exam.date)>date()
- 																 RETURN exam, subject");
+ 																 RETURN exam, subject, exam.date AS date");
  			$query->addEntityMapping("exam", \Ispitomat\Exam::class)
  						->addEntityMapping("subject", \Ispitomat\Subject::class);
  			$query->setParameter("subjectID", $subjectID);
