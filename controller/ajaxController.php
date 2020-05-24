@@ -32,5 +32,25 @@ class ajaxController
 
 		sendJSONandExit("success");
   }
+
+	function accept()
+	{
+		$tus = new Service();
+
+		$examID = $_GET["examID"];
+		$tus->acceptExamGrade($_SESSION["userID"], $examID);
+
+		sendJSONandExit("success");
+	}
+
+	function reject()
+	{
+		$tus = new Service();
+
+		$examID = $_GET["examID"];
+		$tus->rejectExamGrade($_SESSION["userID"], $examID);
+
+		sendJSONandExit("success");
+	}
 }
 ?>

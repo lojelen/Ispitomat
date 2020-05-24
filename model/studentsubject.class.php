@@ -15,7 +15,7 @@ class StudentSubject
      *
      * @OGM\GraphId()
      */
-    protected $neo4jID;
+    protected $id;
 
     /**
      * @var Student
@@ -37,6 +37,13 @@ class StudentSubject
      * @OGM\Property(type="int")
      */
     protected $timesEnrolled;
+
+    /**
+     * @var int
+     *
+     * @OGM\Property(type="int")
+     */
+    protected $grade;
 
     public function __construct(Student $student, Subject $subject, int $timesEnrolled)
     {

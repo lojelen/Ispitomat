@@ -14,6 +14,8 @@ class StudentController
 		$tus = new Service();
 
 		$exams = $tus->getExamsAvailableToStudent($_SESSION["userID"]);
+		$date = array_column($exams, "date");
+		array_multisort($date, SORT_ASC, $exams);
 
 		require_once "view/examsAvailable_index.php";
 	}
@@ -23,6 +25,8 @@ class StudentController
 		$tus = new Service();
 
 		$examsData = $tus->getExamsTakenByStudent($_SESSION["userID"]);
+		$date = array_column($examsData, "date");
+		array_multisort($date, SORT_ASC, $examsData);
 
 		require_once "view/examsTaken_index.php";
 	}
@@ -32,6 +36,8 @@ class StudentController
 		$tus = new Service();
 
 		$exams = $tus->getExamsStudentIsRegisteredFor($_SESSION["userID"]);
+		$date = array_column($exams, "date");
+		array_multisort($date, SORT_ASC, $exams);
 
 		require_once "view/examsRegisteredFor_index.php";
 	}

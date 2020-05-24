@@ -48,7 +48,7 @@ class TeacherController
  	{
 		$tus = new Service();
 
-		$subject= $tus->getSubjectBySubjectID($_SESSION["subjectID"]);
+ 		$subject= $tus->getSubjectBySubjectID($_SESSION["subjectID"]);
 
  		require_once "view/T_addExam_index.php";
  	}
@@ -60,93 +60,92 @@ class TeacherController
 
  		$errorMsg = "NOT_SET";
 
- 		if (isset($_POST["date"]) && isset($_POST["type"]) && isset($_POST["location"]) && isset($_POST["max"]) &&
- 		(strcmp($_POST["location"], "") !== 0) && (strcmp($_POST["date"], "") !== 0)) {
-			if (strcmp($_POST["type"], "written") === 0) $retVal = $tus->insertWrittenExam($_SESSION["subjectID"], $_POST["date"], $_POST["time"], $_POST["duration"], $_POST["location"], $_POST["max"]);
-			else $retVal = $tus->insertOralExam($_SESSION["subjectID"], $_POST["date"], $_POST["location"], $_POST["max"]);
+		if (isset($_POST["date"]) && isset($_POST["type"]) && isset($_POST["location"]) && isset($_POST["max"]) &&
+  		(strcmp($_POST["location"], "") !== 0) && (strcmp($_POST["date"], "") !== 0)) {
+ 			if (strcmp($_POST["type"], "written") === 0) $retVal = $tus->insertWrittenExam($_SESSION["subjectID"], $_POST["date"], $_POST["time"], $_POST["duration"], $_POST["location"], $_POST["max"]);
+ 			else $retVal = $tus->insertOralExam($_SESSION["subjectID"], $_POST["date"], $_POST["location"], $_POST["max"]);
+  			$errorMsg = $retVal; // Poruka koja se ispisuje ako je nešto pošlo po zlu prilikom ubacivanja podataka u bazu
+  		}
+
+ 		require_once "view/T_addExam.php";
+ 	}
+
+	public function edit()
+ 	{
+ 		$tus = new Service();
+
+  		if (isset($_GET["examID"])) {
+  			$exam= $tus->getExamByExamID($_GET["examID"]);
+  		}
+
+  		require_once "view/T_examsAvailable_edit.php";
+ 	}
+
+ 	public function editExamInput()
+ 	{
+ 		// Funkcija pomoću koje pokrećemo ubacivanje podataka o novom ispitu
+ 		$tus = new Service();
+
+ 		$errorMsg = "NOT_SET";
+
+ 		if (isset($_POST["location"]) && isset($_POST["max"]) &&
+ 		(strcmp($_POST["location"], "") !== 0)) {
+ 			$retVal = $tus->editExam($_POST["id"], $_POST["location"], $_POST["max"]);
  			$errorMsg = $retVal; // Poruka koja se ispisuje ako je nešto pošlo po zlu prilikom ubacivanja podataka u bazu
  		}
 
  		require_once "view/T_addExam.php";
  	}
 
-	public function edit()
-	{
-		$tus = new Service();
+ 	public function evaluate()
+ 	{
+ 		$tus = new Service();
 
  		if (isset($_GET["examID"])) {
- 			$exam= $tus->getExamByExamID($_GET["examID"]);
+ 			$data = $tus->getStudentsByExamID($_GET["examID"]);
  		}
 
- 		require_once "view/T_examsAvailable_edit.php";
-	}
+ 		require_once "view/T_examsTaken_evaluate.php";
+ 	}
 
-	public function editExamInput()
-	{
-		// Funkcija pomoću koje pokrećemo ubacivanje podataka o novom ispitu
-		$tus = new Service();
+ 	public function save()
+ 	{
+ 		// Funkcija pomoću koje pokrećemo ubacivanje povratne informacije studentima
 
-		$errorMsg = "NOT_SET";
-
-		if (isset($_POST["location"]) && isset($_POST["max"]) &&
-		(strcmp($_POST["location"], "") !== 0)) {
-			$retVal = $tus->editExam($_POST["id"], $_POST["location"], $_POST["max"]);
-			$errorMsg = $retVal; // Poruka koja se ispisuje ako je nešto pošlo po zlu prilikom ubacivanja podataka u bazu
-		}
-
-		require_once "view/T_addExam.php";
-	}
-
-	public function evaluate()
-	{
-		$tus = new Service();
-
-		if (isset($_GET["examID"])) {
-			$data = $tus->getStudentsByExamID($_GET["examID"]);
-		}
-
-		require_once "view/T_examsTaken_evaluate.php";
-	}
-
-	public function save()
-	{
-		// Funkcija pomoću koje pokrećemo ubacivanje povratne informacije studentima
-
-		$errorMsg = "NOT_SET";
+ 		$errorMsg = "NOT_SET";
 
 		$score = array();
-		$passed = array();
-		$grade = array();
+ 		$passed = array();
+ 		$grade = array();
 
-		if(isset($_POST["jmbag"])){
-				$jmbag = $_POST["jmbag"];
+ 		if(isset($_POST["jmbag"])){
+ 				$jmbag = $_POST["jmbag"];
 
-				foreach ($jmbag as $j) {
-					if (isset($_POST["score_".$j]) && isset($_POST["passed_".$j])){
-						if (isset($_POST["grade_".$j])) $g = $_POST["grade_".$j];
-						else $g = null;
+ 				foreach ($jmbag as $j) {
+ 					if (isset($_POST["score_".$j]) && isset($_POST["passed_".$j])){
+ 						if (isset($_POST["grade_".$j])) $g = $_POST["grade_".$j];
+ 						else $g = null;
 
-						if (strcmp($_POST["passed_".$j],"DA") === 0) $p = true;
-						else $p = false;
+ 						if (strcmp($_POST["passed_".$j],"DA") === 0) $p = true;
+ 						else $p = false;
 
-						$score = [ $j =>$_POST["score_".$j]];
-						$passed = [ $j => $p];
-						$grade = [ $j => $g];
-					}
-				}
+ 						$score = [ $j =>$_POST["score_".$j]];
+ 						$passed = [ $j => $p];
+ 						$grade = [ $j => $g];
+ 					}
+ 				}
 
-				$tus = new Service();
+ 				$tus = new Service();
 
-				$retVal = $tus->setStudentsScoreOfExam($_GET["examID"], $passed, $score, $grade);
-				$errorMsg = $retVal;
-		}
-		else{
-			$errorMsg = "Svi bodovi su već uneseni.";
-		}
+ 				$retVal = $tus->setStudentsScoreOfExam($_GET["examID"], $passed, $score, $grade);
+ 				$errorMsg = $retVal;
+ 		}
+ 		else{
+ 			$errorMsg = "Svi bodovi su već uneseni.";
+ 		}
 
-		require_once "view/T_addExam.php";
-	}
-
+ 		require_once "view/T_addExam.php";
+ 	}
 }
 
 ?>

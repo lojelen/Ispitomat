@@ -101,48 +101,48 @@ button {
   list-style-type: square;
 }
 
-.registerButton, .deregisterButton {
-  width: 100px;
+.registerButton, .deregisterButton, .acceptButton, .rejectButton {
+  width: 110px;
   margin-left: 20px;
 }
 
 .addButton, .editButton, .evaluateButton, .saveButton {
-  width: 100px;
-  margin-right: 20px;
-  float: right;
-}
+   width: 100px;
+   margin-right: 20px;
+   float: right;
+ }
 
-.subject {
-  margin-bottom: 5px;
-  padding: 8px;
-  background-color: #DED8E6;
-  box-shadow: 2px 2px #9E9E9E;
-}
+ .subject {
+   margin-bottom: 5px;
+   padding: 8px;
+   background-color: #DED8E6;
+   box-shadow: 2px 2px #9E9E9E;
+ }
 
-.subject, a {
-  color: black;
-  text-align: center;
-  text-decoration: none;
-}
+ .subject, a {
+   color: black;
+   text-align: center;
+   text-decoration: none;
+ }
 
-#newExamForm, #editExamForm, #students {
-  width: 69%;
-  margin-top: 10px;
-  margin-right: 6px;
-  padding: 5px;
-  float: right;
-  background-color: #F5F5F5;
-  line-height: 1.5;
-  border-radius: 15px;
-}
+ #newExamForm, #editExamForm, #students {
+   width: 69%;
+   margin-top: 10px;
+   margin-right: 6px;
+   padding: 5px;
+   float: right;
+   background-color: #F5F5F5;
+   line-height: 1.5;
+   border-radius: 15px;
+ }
 
-#students ul {
-  list-style-type: none;
-}
+ #students ul {
+   list-style-type: none;
+ }
 
-#students li {
-  margin-bottom: 10px;
-}
+ #students li {
+   margin-bottom: 10px;
+ }
 
 #welcome {
   width: 70%;
@@ -156,9 +156,9 @@ button {
 }
 
 #welcome2 {
-  margin-top: 10px;
-  text-align: center;
-}
+   margin-top: 10px;
+   text-align: center;
+ }
 
 .ispitomat {
   font-family: "Atomic Age";

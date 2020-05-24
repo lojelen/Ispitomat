@@ -15,7 +15,7 @@ class User
 	*
   * @OGM\GraphId()
   */
-  protected $neo4jID;
+  protected $id;
 
 	/**
   * @var string
