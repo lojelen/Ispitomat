@@ -31,6 +31,8 @@ class TeacherController
  		$tus = new Service();
 
  		$exams = $tus->getExamsAvailableFromSubject($_SESSION["subjectID"]);
+		$date = array_column($exams, "date");
+		array_multisort($date, SORT_ASC, $exams);
 
  		require_once "view/T_examsAvailable_index.php";
  	}
@@ -40,6 +42,8 @@ class TeacherController
  		$tus = new Service();
 
  		$examsData = $tus->getExamsTakenFromSubject($_SESSION["subjectID"]);
+		$date = array_column($examsData, "date");
+		array_multisort($date, SORT_ASC, $examsData);
 
  		require_once "view/T_examsTaken_index.php";
  	}
