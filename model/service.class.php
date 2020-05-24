@@ -439,7 +439,7 @@ class Service
  			$exam->subject->add($subject);
  			$em->flush();
  		}
- 		catch(Exception $e) { return "Error " . $e->getMessage(); }
+ 		catch(Exception $e) { return $e->getMessage(); }
 
  		return "OK";
 
@@ -469,7 +469,7 @@ class Service
  			$em->flush();
 
  		}
- 		catch(Exception $e) { return "Error " . $e->getMessage(); }
+ 		catch(Exception $e) { return $e->getMessage(); }
 
  		return "OK";
 
@@ -484,9 +484,10 @@ class Service
  			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
  			$exam = $examsRepository->find($id);
 
-			$exams = $examsRepository->findBy(["date" => $xam->date, "location" => $location]);
+			$exams = $examsRepository->findBy(["date" => $exam->date, "location" => $location]);
 
  			foreach ($exams as $e) {
+				if(strcmp($exam->id, $e->id) === 0) continue;
  				$t1 = substr($e->time, 0, 5);
  				$t2 = substr($exam->time, 0, 5);
  				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2));
@@ -503,7 +504,7 @@ class Service
  			$em->flush();
 
  		}
- 		catch(Exception $e) { return "Error " . $e->getMessage(); }
+ 		catch(Exception $e) { return $e->getMessage(); }
 
  		return "OK";
  	}
@@ -563,7 +564,7 @@ class Service
  			$em->flush();
 
  		}
- 		catch(Exception $e) { exit("Error " . $e->getMessage()); }
+ 		catch(Exception $e) { return $e->getMessage(); }
 
  		return "OK";
  	}
@@ -588,6 +589,28 @@ class Service
 
  		return $data;
  	}
+
+	function getStudentScoresByExamID($examID)
+	{
+		try {
+			$em = DB::getConnection();
+
+			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+			$exam = $examsRepository->find($examID);
+
+		}
+		catch(Exception $e) { exit("Error " . $e->getMessage()); }
+
+		$data = array();
+		$examsTaken = $exam->studentsTakenBy;
+		$subject = $exam->subject[0];
+		foreach ($examsTaken as $et) {
+			$data[] = [ "student" => $et->student, "maxScore" => $exam->maxScore,"score" => $et->score, "passed" => $et->passed, "grade" => $et->grade];
+		}
+
+		return $data;
+	}
+
 };
 
 ?>
