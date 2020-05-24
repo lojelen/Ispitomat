@@ -11,7 +11,7 @@
     if (strcmp($exam->type, "written") === 0){ ?>
       <span class="col-3">Vrsta: pismeni </span><br>
       <span class="col-3">Vrijeme: <?php echo $exam->time; ?></span><br>
-      <span class="col-3">Trajanje: <?php echo $exam->duration; ?></span><br>
+      <span class="col-3">Trajanje: <?php echo $exam->duration; ?> min</span><br>
    <?php }
    else ?> <span class="col-3">Vrsta: usmeni </span><br>
   	<span class="col-3">Mjesto: </span><input type="text" name="location" value="<?php echo $exam->location; ?>"><br>

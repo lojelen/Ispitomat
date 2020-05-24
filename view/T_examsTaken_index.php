@@ -29,6 +29,9 @@ foreach($examsData as $examData)
   ?>
   <form id="evaluateForm" method="post" action="ispitomat.php?rt=teacher/evaluate&examID=<?php echo $examData["exam"]->id; ?>">
     <button type="submit" name="evaluateButton" id="evaluate_<?php echo $examData["exam"]->id; ?>">Upiši bodove</button>
+  </form>
+  <form id="reviewForm" method="post" action="ispitomat.php?rt=teacher/review&examID=<?php echo $examData["exam"]->id; ?>">
+    <button type="submit" name="reviewButton" id="review_<?php echo $examData["exam"]->id; ?>">Pregledaj upisane bodove</button>
   </form></div>
 </div>
 <?php } ?>
