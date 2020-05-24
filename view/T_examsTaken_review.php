@@ -16,10 +16,10 @@
       if($st["passed"]){
         echo 'Prošao/la.';
         if(!is_null($st["grade"])) {
-          echo 'Ocjena: '.$st["grade"].'</li>';
+          echo 'Ocjena: '.$st["grade"].' </div></li>';
         }
       }
-      else echo 'Nije prošao/la.</li>';
+      else echo 'Nije prošao/la. </div></li>';
     }
   }
  ?>
