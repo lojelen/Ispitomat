@@ -4,6 +4,7 @@ $(document).ready(function()
 	{
     var examID = $(this).prop("id").substring(7);
     var parent = $(this).parent();
+    var examsDiv = parent.parent();
     var acceptButton = $(this);
     var rejectButton = parent.children("#reject_" + examID);
     $.ajax(
@@ -14,7 +15,7 @@ $(document).ready(function()
       dataType: "json",
       success: function(data)
       {
-        $("#exams").prepend("<div class='info'>Uspješno ste prihvatili ocjenu!</div>");
+        examsDiv.prepend("<div class='info'>Uspješno ste prihvatili ocjenu!</div>");
         acceptButton.remove();
         rejectButton.remove();
       }

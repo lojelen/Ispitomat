@@ -2,13 +2,13 @@
 
 require_once "view/_navStudent.php"; ?>
 
-<div id="exams">
+<div class="exams">
 
 <?php
 
 foreach($exams as $exam)
 {
-  echo "<div class='examAvailable'><h3 class='examHeader'>" . $exam["exam"]->subject[0]->subjectName .
+  echo "<div class='examRegisteredFor'><h3 class='examHeader'>" . $exam["exam"]->subject[0]->subjectName .
         " (šifra: " . $exam["exam"]->subject[0]->subjectID . ")</h3><hr>";
   $examInfo = "<ul><li><b>Akademska godina:</b> " . $exam["exam"]->schoolYear . "</li><li><b>Semestar:</b> ";
   if (strcmp($exam["exam"]->subject[0]->semester, "Z") === 0)
@@ -32,6 +32,6 @@ if ($exam["deregister"])
 
 <div/>
 
-<script src="./scripts/deregister.js"></script>
+<script src="./scripts/deregister.js?2"></script>
 
 <?php require_once "view/_footer.php"; ?>

@@ -1,4 +1,4 @@
-<nav id="nav">
+<nav class="nav">
   <div id="welcome2"><h3><?php echo $_SESSION["subjectID"]; ?></h3></div>
   <div class="navElement"><a class="navLink" id="availableExams" href="ispitomat.php?rt=teacher/availableExams">Nadolazeći ispiti</a></div>
   <div class="navElement"><a class="navLink" id="takenExams" href="ispitomat.php?rt=teacher/takenExams">Obavljeni ispiti</a></div>

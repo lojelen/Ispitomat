@@ -1,10 +1,11 @@
 $(document).ready(function()
 {
 	/*
-	Skripta pomoću koje reagiramo na događaje vezane uz elemente liste unutar navigacije u headeru.
-	Prilikom klika na neki od elemenata, mijenja se podatak o trenutno aktivnom odjeljku.
-	Element liste (koji predstavlja trenutni aktivni odjeljak) dobiva klasu "current", dok svim ostalima
-	oduzimamo klasu "current". Pomoću CSS-a mijenjamo izgled elemenata s klasom "current".
+	Skripta pomoću koje reagiramo na događaje vezane uz linkove unutar navigacije.
+	Prilikom klika na neki od linkova, mijenja se podatak o trenutno aktivnom odjeljku.
+	Div-u s odgovarajućim linkom (koji predstavlja trenutno aktivni odjeljak) dodajemo klasu "current",
+	dok svima ostalima klasu "current" mičemo.
+	Pomoću CSS-a mijenjamo izgled elemenata s klasom "current".
 	*/
 	navDecoration();
 

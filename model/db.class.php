@@ -19,10 +19,10 @@ class DB
 	    {
         DB::$em = EntityManager::create(
           "http://neo4j:@localhost:7474");
-		   }
-		   catch (Exception $e) { exit ("Error: " . $e->getMessage()); }
-     return DB::$em;
+		  }
+		  catch (Exception $e) { exit ("Error: " . $e->getMessage()); }
 	  }
+    return DB::$em;
   }
 }
 

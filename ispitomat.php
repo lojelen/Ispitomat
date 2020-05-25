@@ -11,7 +11,7 @@ else
 $parts = explode("/", $route);
 
 $controllerName = $parts[0] . "Controller";
-if(isset($parts[1]))
+if (isset($parts[1]))
 	$action = $parts[1];
 else
 	$action = "index";

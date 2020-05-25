@@ -22,7 +22,6 @@ class LoginController
 				$message = "Korisnik s tim imenom ne postoji.";
 			else {
 				$_SESSION["userID"] = $userID;
-				// User je nadklasa dviju podklasa: Teacher i Student
 				$_SESSION["type"] = $userType;
 				if (strcmp($_SESSION["type"], "Teacher") === 0) {
 					header("Location: ispitomat.php?rt=teacher");

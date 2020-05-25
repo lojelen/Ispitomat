@@ -2,7 +2,7 @@
 
 require_once "view/_navStudent.php"; ?>
 
-<div id="exams">
+<div class="exams">
 
 <?php
 foreach($examsData as $examData)
@@ -16,10 +16,6 @@ foreach($examsData as $examData)
     $examInfo = $examInfo . "ljetni</li>";
   $examInfo = $examInfo . "<li><b>Datum ispita:</b> " . date("d.m.Y", strtotime($examData["exam"]->date)) .
               "</li><li><b>Vrsta ispita:</b> " . (strcmp($examData["exam"]->type, "written") === 0 ? "pismeni" : "usmeni") . "</li>";
-
-  if (strcmp($examData["exam"]->type, "pismeni") === 0)
-    $examInfo = $examInfo . "<li><b>Maksimalan broj bodova:</b> " . $examData["exam"]->maxScore . "</li>";
-
   if (isset($examData["examTaken"])) {
     if ($examData["examTaken"]->passed)
       $examInfo = $examInfo . "<li><b>Ispit položen:</b> DA";
@@ -37,7 +33,6 @@ foreach($examsData as $examData)
   else {
     $examInfo = $examInfo . "<li><b>Rezultati ispita:</b> nepoznati</li></ul>";
   }
-
   echo $examInfo;
 
   if ($canAcceptOrReject) {
@@ -47,7 +42,7 @@ foreach($examsData as $examData)
   echo "</div>";
 } ?>
 
-<div/>
+</div>
 
 <script src="./scripts/accept.js"></script>
 <script src="./scripts/reject.js"></script>

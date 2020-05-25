@@ -4,6 +4,7 @@ $(document).ready(function()
 	{
     var examID = $(this).prop("id").substring(11);
     var parent = $(this).parent();
+    var examsDiv = parent.parent();
     $.ajax(
     {
       url: "ispitomat.php?rt=ajax/deregister",
@@ -12,7 +13,7 @@ $(document).ready(function()
       dataType: "json",
       success: function(data)
       {
-        $("#exams").prepend("<div class='info'>Uspješno ste se odjavili s ispita ID-a " + examID + "!</div>");
+        examsDiv.prepend("<div class='info'>Uspješno ste se odjavili s ispita ID-a " + examID + "!</div>");
         parent.remove();
       }
     });

@@ -28,7 +28,7 @@ class ajaxController
 		$tus = new Service();
 
 		$examID = $_GET["examID"];
-		$tus->deregisterStudentForExam($_SESSION["userID"], $examID);
+		$tus->deregisterStudentFromExam($_SESSION["userID"], $examID);
 
 		sendJSONandExit("success");
   }

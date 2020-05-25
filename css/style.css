@@ -65,7 +65,7 @@ button {
   font-size: 12px;
 }
 
-#nav {
+.nav {
   width: 25%;
   margin: 10px;
   border-right: 1px solid #9E9E9E;
@@ -86,7 +86,7 @@ button {
   text-decoration: none;
 }
 
-.examTaken, .examAvailable, .examRegisteredFor {
+.examTaken, div[class^="examAvailable"], .examRegisteredFor {
   width: 69%;
   margin-top: 10px;
   margin-right: 6px;
@@ -97,7 +97,7 @@ button {
   border-radius: 15px;
 }
 
-.examTaken ul, .examAvailable ul, .examRegisteredFor ul {
+.examTaken ul, div[class^="examAvailable"] ul, .examRegisteredFor ul {
   list-style-type: square;
 }
 
