@@ -14,7 +14,7 @@
        echo '<li> <div class="studentScore"> '.$st["student"]->jmbag . '<hr>';
        echo 'Broj bodova: '.$st["score"] . '/' . $st["maxScore"] . '<br>';
        if($st["passed"]){
-         echo 'Prošao/la.';
+         echo 'Prošao/la. ';
          if(!is_null($st["grade"])) {
            echo 'Ocjena: '.$st["grade"].' </div></li>';
          }

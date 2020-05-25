@@ -26,10 +26,22 @@ foreach($examsData as $examData)
   }
   echo $examInfo;
   //Upiši bodove
+
+  $d = date("Y-m-d");
+  $currYear = substr($d, 0, 4);
+  $currMonth = substr($d, 5, 2);
+  if (intval($currMonth) > 9)
+    $currSchoolYear = $currYear . "./" . $currYear + 1 . ".";
+  else
+    $currSchoolYear = $currYear - 1 . "./" . $currYear . ".";
+
+  if(strcmp($currSchoolYear,$examData["exam"]->schoolYear) === 0)
+  {
   ?>
   <form id="evaluateForm" method="post" action="ispitomat.php?rt=teacher/evaluate&examID=<?php echo $examData["exam"]->id; ?>">
     <button type="submit" name="evaluateButton" id="evaluate_<?php echo $examData["exam"]->id; ?>">Upiši bodove</button>
   </form>
+<?php }?>
   <form id="reviewForm" method="post" action="ispitomat.php?rt=teacher/review&examID=<?php echo $examData["exam"]->id; ?>">
     <button type="submit" name="reviewButton" id="review_<?php echo $examData["exam"]->id; ?>">Pregledaj upisane bodove</button>
    </form>
