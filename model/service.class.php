@@ -98,7 +98,7 @@ class Service
 			}
 			else {
 				if ($d1 <= $d2) {
-					$examsData[] = ["exam" => $examRegisteredFor, "subject" => $examRegisteredFor->subject[0]];
+					$examsData[] = ["exam" => $examRegisteredFor, "subject" => $examRegisteredFor->subject[0], "date" => $examTaken->exam->date];
 				}
 			}
 		}
@@ -131,9 +131,9 @@ class Service
 		$currYear = substr($d2, 0, 4);
 		$currMonth = substr($d2, 5, 2);
 		if (intval($currMonth) > 9)
-			$currSchoolYear = $currYear . "./" . $currYear + 1;
+			$currSchoolYear = $currYear . "./" . $currYear + 1 . ".";
 		else
-			$currSchoolYear = $currYear - 1 . "./" . $currYear;
+			$currSchoolYear = $currYear - 1 . "./" . $currYear . ".";
 		foreach ($subjects as $ss) {
 			if ($ss->grade !== null)
 				continue;
@@ -160,7 +160,8 @@ class Service
 						$available = 0;
 						break;
 					}
-					else if (strcmp($et->exam->type, "written") === 0 && $et->passed && $et->exam->subject[0]->oralExam) {
+					else if (strcmp($et->exam->type, "written") === 0 && $et->passed && (strcmp($et->exam->schoolYear, $currSchoolYear) === 0)
+									 && $et->exam->subject[0]->oralExam) {
 						$available = 2;
 					}
 					else if (strcmp($et->exam->type, "written") === 0 && !$et->passed) {
@@ -412,7 +413,16 @@ class Service
  			$exam->__set("duration",$duration);
  			$exam->__set("location",$location);
  			$exam->__set("maxScore",$max);
- 			$exam->__set("schoolYear","2019./20.");
+
+			$d = date("Y-m-d");
+			$currYear = substr($d, 0, 4);
+			$currMonth = substr($d, 5, 2);
+			if (intval($currMonth) > 9)
+				$currSchoolYear = $currYear . "./" . $currYear + 1 . ".";
+			else
+				$currSchoolYear = $currYear - 1 . "./" . $currYear . ".";
+
+ 			$exam->__set("schoolYear", $currSchoolYear);
 
 			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
  			$exams = $examsRepository->findBy(["date" => $date, "location" => $location]);
@@ -455,7 +465,16 @@ class Service
  			$exam->__set("type","oral");
  			$exam->__set("location",$location);
  			$exam->__set("maxScore",$max);
- 			$exam->__set("schoolYear","2019./20.");
+
+			$d = date("Y-m-d");
+			$currYear = substr($d, 0, 4);
+			$currMonth = substr($d, 5, 2);
+			if (intval($currMonth) > 9)
+				$currSchoolYear = $currYear . "./" . $currYear + 1 . ".";
+			else
+				$currSchoolYear = $currYear - 1 . "./" . $currYear . ".";
+
+ 			$exam->__set("schoolYear", $currSchoolYear);
 
  			$em->persist($exam);
 
@@ -591,26 +610,25 @@ class Service
  	}
 
 	function getStudentScoresByExamID($examID)
-	{
-		try {
-			$em = DB::getConnection();
+ 	{
+ 		try {
+ 			$em = DB::getConnection();
 
-			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
-			$exam = $examsRepository->find($examID);
+ 			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+ 			$exam = $examsRepository->find($examID);
 
-		}
-		catch(Exception $e) { exit("Error " . $e->getMessage()); }
+ 		}
+ 		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
-		$data = array();
-		$examsTaken = $exam->studentsTakenBy;
-		$subject = $exam->subject[0];
-		foreach ($examsTaken as $et) {
-			$data[] = [ "student" => $et->student, "maxScore" => $exam->maxScore,"score" => $et->score, "passed" => $et->passed, "grade" => $et->grade];
-		}
+ 		$data = array();
+ 		$examsTaken = $exam->studentsTakenBy;
+ 		$subject = $exam->subject[0];
+ 		foreach ($examsTaken as $et) {
+ 			$data[] = [ "student" => $et->student, "maxScore" => $exam->maxScore,"score" => $et->score, "passed" => $et->passed, "grade" => $et->grade];
+ 		}
 
-		return $data;
-	}
-
+ 		return $data;
+ 	}
 };
 
 ?>

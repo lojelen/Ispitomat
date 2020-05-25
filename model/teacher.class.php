@@ -16,13 +16,6 @@ class Teacher extends User
   *
   * @OGM\Property(type="string")
   */
-	protected $oib;
-
-	/**
-  * @var string
-  *
-  * @OGM\Property(type="string")
-  */
 	protected $title;
 
 	/**

@@ -37,7 +37,7 @@ class Subject
   *
   * @OGM\Property(type="int")
   */
-	protected $year; // in minutes
+	protected $year;
 
 	/**
   * @var string

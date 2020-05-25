@@ -45,13 +45,16 @@ class StudentSubject
      */
     protected $grade;
 
-    public function __construct(Student $student, Subject $subject, int $timesEnrolled)
+    public function __construct(Student $student, Subject $subject, int $timesEnrolled, int $grade)
     {
         $this->student = $teacher;
         $this->subject = $subject;
         $this->timesEnrolled = $timesEnrolled;
+        $this->grade = $grade;
     }
 
     function __get($prop) { return $this->$prop; }
   	function __set($prop, $val) { $this->$prop = $val; return $this; }
 }
+
+?>

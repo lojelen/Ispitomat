@@ -1,6 +1,6 @@
 <?php
 
-require_once 'vendor/autoload.php';
+require_once "vendor/autoload.php";
 
 use GraphAware\Neo4j\Client\ClientBuilder;
 use GraphAware\Neo4j\OGM\EntityManager;
@@ -19,13 +19,10 @@ class DB
 	  {
 	    try
 	    {
-        DB::$em = EntityManager::create("http://neo4j:@localhost:7474");
-				/*DB::$client = ClientBuilder::create()
-          ->addConnection("default", 'http://neo4j:@localhost:7474')
-          ->build();*/
+        DB::$em = EntityManager::create(
+          "http://neo4j:@localhost:7474");
 		   }
 		   catch (Exception $e) { exit ("Error: " . $e->getMessage()); }
-		 //return DB::$client;
      return DB::$em;
 	  }
   }
@@ -37,7 +34,7 @@ class DB
 	    try
 	    {
 				DB::$client = ClientBuilder::create()
-          ->addConnection("default", 'http://neo4j:@localhost:7474')
+          ->addConnection("default", "http://neo4j:@localhost:7474")
           ->build();
 		   }
 		   catch (Exception $e) { exit ("Error: " . $e->getMessage()); }

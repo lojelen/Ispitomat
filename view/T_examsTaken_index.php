@@ -32,7 +32,7 @@ foreach($examsData as $examData)
   </form>
   <form id="reviewForm" method="post" action="ispitomat.php?rt=teacher/review&examID=<?php echo $examData["exam"]->id; ?>">
     <button type="submit" name="reviewButton" id="review_<?php echo $examData["exam"]->id; ?>">Pregledaj upisane bodove</button>
-  </form>
+   </form>
 </div>
 <?php } ?>
 

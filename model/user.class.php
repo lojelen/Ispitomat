@@ -24,6 +24,13 @@ class User
   */
 	protected $userID;
 
+  /**
+  * @var string
+  *
+  * @OGM\Property(type="string")
+  */
+	protected $oib;
+
 	/**
   * @var string
   *

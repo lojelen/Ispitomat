@@ -32,7 +32,7 @@ class TeacherController
 
  		$exams = $tus->getExamsAvailableFromSubject($_SESSION["subjectID"]);
 		$date = array_column($exams, "date");
-		array_multisort($date, SORT_ASC, $exams);
+ 		array_multisort($date, SORT_ASC, $exams);
 
  		require_once "view/T_examsAvailable_index.php";
  	}
@@ -43,7 +43,7 @@ class TeacherController
 
  		$examsData = $tus->getExamsTakenFromSubject($_SESSION["subjectID"]);
 		$date = array_column($examsData, "date");
-		array_multisort($date, SORT_ASC, $examsData);
+ 		array_multisort($date, SORT_ASC, $examsData);
 
  		require_once "view/T_examsTaken_index.php";
  	}
@@ -66,17 +66,17 @@ class TeacherController
 
 		if (isset($_POST["date"]) && isset($_POST["type"]) && isset($_POST["location"]) && isset($_POST["max"]) &&
   		(strcmp($_POST["location"], "") !== 0) && (strcmp($_POST["date"], "") !== 0)) {
- 			if (strcmp($_POST["type"], "written") === 0){
-				if(isset($_POST["time"]) && isset($_POST["duration"]) && (strcmp($_POST["duration"], "") !== 0) && (preg_match("/^(?:2[0-3]|[01][0-9]):[0-5][0-9]$/", $_POST["time"]))){
-					$retVal = $tus->insertWrittenExam($_SESSION["subjectID"], $_POST["date"], $_POST["time"], $_POST["duration"], $_POST["location"], $_POST["max"]);
-				}
-				else $retVal = "Nije uneseno sve potrebno za dodati ispit.";
-			}
+			if (strcmp($_POST["type"], "written") === 0){
+	 			if(isset($_POST["time"]) && isset($_POST["duration"]) && (strcmp($_POST["duration"], "") !== 0) && (preg_match("/^(?:2[0-3]|[01][0-9]):[0-5][0-9]$/", $_POST["time"]))){
+	 				$retVal = $tus->insertWrittenExam($_SESSION["subjectID"], $_POST["date"], $_POST["time"], $_POST["duration"], $_POST["location"], $_POST["max"]);
+	 			}
+	 			else $retVal = "Nije uneseno sve potrebno za dodati ispit.";
+	 		}
  			else $retVal = $tus->insertOralExam($_SESSION["subjectID"], $_POST["date"], $_POST["location"], $_POST["max"]);
   	}
 		else $retVal = "Nije uneseno sve potrebno za dodati ispit.";
 
-			$errorMsg = $retVal; // Poruka koja se ispisuje ako je nešto pošlo po zlu prilikom ubacivanja podataka u bazu
+ 		$errorMsg = $retVal; // Poruka koja se ispisuje ako je nešto pošlo po zlu prilikom ubacivanja podataka u bazu
 
  		require_once "view/T_addExam.php";
  	}
@@ -159,15 +159,15 @@ class TeacherController
  	}
 
 	public function review()
-	{
-		$tus = new Service();
+ 	{
+ 		$tus = new Service();
 
-		if (isset($_GET["examID"])) {
-			$data = $tus->getStudentScoresByExamID($_GET["examID"]);
-		}
+ 		if (isset($_GET["examID"])) {
+ 			$data = $tus->getStudentScoresByExamID($_GET["examID"]);
+ 		}
 
-		require_once "view/T_examsTaken_review.php";
-	}
+ 		require_once "view/T_examsTaken_review.php";
+ 	}
 }
 
 ?>
