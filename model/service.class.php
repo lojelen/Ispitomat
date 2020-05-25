@@ -317,19 +317,15 @@ class Service
  	{
  		try
  		{
- 			$client = DB::getClient();
- 			$query = "MATCH (p:Teacher {userID:'" . $userID . "'})-[t:TEACHES]->(subject:Subject)
- 								RETURN subject";
- 			$results = $client->run($query)->getRecords();
+			$em = DB::getConnection();
+ 			$query = $em->createQuery("MATCH (teacher:Teacher)-[t:TEACHES]->(subject:Subject) WHERE teacher.userID={userID} RETURN subject");
+ 			$query->addEntityMapping("subject", \Ispitomat\Subject::class);
+ 			$query->setParameter("userID", $userID);
+ 			$results = $query->execute();
  		}
  		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
 
- 		$arr = array();
- 		foreach ($results as $result) {
- 			$subject = $result->value("subject");
- 			$arr[] = ["subjectID" => $subject->get("subjectID"), "subjectName" => $subject->get("subjectName"), "semester" => $subject->get("semester")];
- 		}
- 		return $arr;
+ 		return $results;
  	}
 
  	function getExamsTakenFromSubject($subjectID)
@@ -428,6 +424,7 @@ class Service
  			$exams = $examsRepository->findBy(["date" => $date, "location" => $location]);
 
  			foreach ($exams as $e) {
+				if(strcmp($e->type, "oral") === 0) return "Postoji usmeni ispit taj dan na toj lokaciji.";
  				$t1 = substr($e->time, 0, 5);
  				$t2 = substr($exam->time, 0, 5);
  				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2));
@@ -476,6 +473,14 @@ class Service
 
  			$exam->__set("schoolYear", $currSchoolYear);
 
+			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+ 			$exams = $examsRepository->findBy(["date" => $date, "location" => $location]);
+
+ 			if (!empty($exams)) {
+				$em->flush();
+ 				return "Postoji ispit taj dan na toj lokaciji.";
+ 			}
+
  			$em->persist($exam);
 
  			$em->flush();
@@ -507,6 +512,7 @@ class Service
 
  			foreach ($exams as $e) {
 				if(strcmp($exam->id, $e->id) === 0) continue;
+				if(strcmp($e->type, "oral") === 0) return "Postoji usmeni ispit taj dan na toj lokaciji.";
  				$t1 = substr($e->time, 0, 5);
  				$t2 = substr($exam->time, 0, 5);
  				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2));
