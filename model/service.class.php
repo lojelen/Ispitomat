@@ -318,12 +318,12 @@ class Service
  		try
  		{
 			$em = DB::getConnection();
- 			$query = $em->createQuery("MATCH (teacher:Teacher)-[t:TEACHES]->(subject:Subject) WHERE teacher.userID={userID} RETURN subject");
- 			$query->addEntityMapping("subject", \Ispitomat\Subject::class);
- 			$query->setParameter("userID", $userID);
- 			$results = $query->execute();
+  		$query = $em->createQuery("MATCH (teacher:Teacher)-[t:TEACHES]->(subject:Subject) WHERE teacher.userID={userID} RETURN subject");
+  		$query->addEntityMapping("subject", \Ispitomat\Subject::class);
+  		$query->setParameter("userID", $userID);
+  		$results = $query->execute();
  		}
- 		catch(PDOException $e) { exit("PDO error " . $e->getMessage()); }
+ 		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
  		return $results;
  	}
@@ -449,7 +449,6 @@ class Service
  		catch(Exception $e) { return $e->getMessage(); }
 
  		return "OK";
-
  	}
 
  	function insertOralExam($subjectID, $date, $location, $max)
@@ -474,15 +473,14 @@ class Service
  			$exam->__set("schoolYear", $currSchoolYear);
 
 			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
- 			$exams = $examsRepository->findBy(["date" => $date, "location" => $location]);
+  		$exams = $examsRepository->findBy(["date" => $date, "location" => $location]);
 
- 			if (!empty($exams)) {
-				$em->flush();
- 				return "Postoji ispit taj dan na toj lokaciji.";
- 			}
+  		if (!empty($exams)) {
+ 				$em->flush();
+  			return "Postoji ispit taj dan na toj lokaciji.";
+  		}
 
  			$em->persist($exam);
-
  			$em->flush();
 
  			$subjectRepository = $em->getRepository(\Ispitomat\Subject::class);

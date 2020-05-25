@@ -16,7 +16,6 @@
   foreach($data as $st)
   {
     echo '<li> <div class="studentScore"> '.$st["student"]->jmbag . '<hr>';
-
     echo '<input type="text" name="jmbag[]" value = "'.$st["student"]->jmbag . '" style="display:none">';
     echo 'Broj bodova: <input type="number" name="score_'.$st["student"]->jmbag.'" step="1" min="0" max="'.$st["exam"]->maxScore.'" value="0" required = "required"> <br>';
     echo 'Prošao/la: <input type="radio" name="passed_'.$st["student"]->jmbag.'" value="DA" required = "required"> DA';

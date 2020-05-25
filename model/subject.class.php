@@ -33,13 +33,6 @@ class Subject
 	protected $subjectName;
 
 	/**
-  * @var int
-  *
-  * @OGM\Property(type="int")
-  */
-	protected $year;
-
-	/**
   * @var string
   *
   * @OGM\Property(type="string")
@@ -81,12 +74,12 @@ class Subject
       $this->exams = new Collection();
   }
 
-  public static function withArgs($subjectID, $subjectName, $year, $semester) {
+  public static function withArgs($subjectID, $subjectName, $semester, $oralExam) {
       $instance = new self();
       $instance->subjectID = $subjectID;
       $instance->subjectName = $subjectName;
-  		$instance->year = $year;
   		$instance->semester = $semester;
+      $instance->oralEexam = $oralExam;
       return $instance;
     }
 
