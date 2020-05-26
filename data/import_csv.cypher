@@ -1,10 +1,8 @@
-//Datoteke se trebaju nalaziti u folderu import.
-
 LOAD CSV WITH HEADERS FROM "file:///exams.csv" AS row
 fieldterminator ";"
 CREATE (n:Exam)
 SET n = row,
-n.duration =toInt(row.duration),
+n.duration = toInt(row.duration),
 n.maxScore = toFloat(row.maxScore);
 
 LOAD CSV WITH HEADERS FROM "file:///subjects.csv" AS row
@@ -34,10 +32,10 @@ CREATE INDEX ON :Exam(examID);
 
 //Kreiranje veza.
 
-LOAD CSV WITH HEADERS FROM "file:///enroles.csv" AS row
+LOAD CSV WITH HEADERS FROM "file:///enrolled_in.csv" AS row
 fieldterminator ";"
 MATCH (k:Subject), (s:Student)
-WHERE k.subjectID = row.subjectID AND s.jmbag = row.studentID 
+WHERE k.subjectID = row.subjectID AND s.jmbag = row.jmbag
 CREATE (s)-[v:ENROLLED_IN]->(k)
 SET v.timesEnrolled = toInteger(row.timesEnrolled),
 v.grade = toInteger(row.grade);
@@ -45,20 +43,20 @@ v.grade = toInteger(row.grade);
 LOAD CSV WITH HEADERS FROM "file:///in.csv" AS row
 fieldterminator ";"
 MATCH (e:Exam), (s:Subject)
-WHERE e.examID = row.examID AND s.subjectID = row.subjectID 
+WHERE e.examID = row.examID AND s.subjectID = row.subjectID
 CREATE (e)-[f:IN]->(s);
 
 LOAD CSV WITH HEADERS FROM "file:///teaches.csv" AS row
 fieldterminator ";"
 MATCH (p:Teacher), (s:Subject)
-WHERE p.oib = row.professorID AND s.subjectID = row.subjectID 
+WHERE p.oib = row.oib AND s.subjectID = row.subjectID
 CREATE (p)-[f:TEACHES]->(s)
 SET f = row;
 
 LOAD CSV WITH HEADERS FROM "file:///takes.csv" AS row
 fieldterminator ";"
 MATCH (e:Exam), (s:Student)
-WHERE e.examID = row.examID AND s.jmbag = row.studentID 
+WHERE e.examID = row.examID AND s.jmbag = row.jmbag
 CREATE (e)<-[v:TAKES]-(s)
 SET v = row,
 v.passed = toBoolean(row.passed),
@@ -68,6 +66,6 @@ v.grade = toInteger(row.grade);
 LOAD CSV WITH HEADERS FROM "file:///registered.csv" AS row
 fieldterminator ";"
 MATCH (e:Exam), (s:Student)
-WHERE e.examID = row.examID AND s.jmbag = row.studentID 
+WHERE e.examID = row.examID AND s.jmbag = row.jmbag
 CREATE (e)<-[v:REGISTERED_FOR]-(s)
 SET v = row;
