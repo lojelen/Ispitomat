@@ -2,6 +2,7 @@ LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/r8v5y0og5lbxba7/
 fieldterminator ";"
 CREATE (n:Exam)
 SET n = row,
+n.duration = toInt(row.duration),
 n.maxScore = toFloat(row.maxScore);
 
 LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/64icemmnt7vbycq/subjects.csv?dl=0" AS row
