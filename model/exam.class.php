@@ -18,6 +18,13 @@ class Exam
   */
   protected $id;
 
+  /**
+  * @var string
+  *
+  * @OGM\Property(type="string")
+  */
+	protected $examID;
+
 	/**
   * @var string
   *

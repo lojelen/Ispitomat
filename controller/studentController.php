@@ -26,7 +26,7 @@ class StudentController
 
 		$examsData = $tus->getExamsTakenByStudent($_SESSION["userID"]);
 		$date = array_column($examsData, "date");
-		array_multisort($date, SORT_ASC, $examsData);
+		array_multisort($date, SORT_DESC, $examsData);
 
 		require_once "view/examsTaken_index.php";
 	}

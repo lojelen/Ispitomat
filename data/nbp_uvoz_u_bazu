@@ -1,23 +1,21 @@
-Datoteke se trebaju nalaziti u folderu import.
-
-LOAD CSV WITH HEADERS FROM "file:///exams.csv" AS row
+LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/r8v5y0og5lbxba7/exams.csv?dl=0" AS row
 fieldterminator ";"
 CREATE (n:Exam)
 SET n = row,
 n.maxScore = toFloat(row.maxScore);
 
-LOAD CSV WITH HEADERS FROM "file:///subjects.csv" AS row
+LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/64icemmnt7vbycq/subjects.csv?dl=0" AS row
 fieldterminator ";"
 CREATE (n:Subject)
 SET n = row,
 n.oralExam = toBoolean(row.oralExam);
 
-LOAD CSV WITH HEADERS FROM "file:///teachers.csv" AS row
+LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/ec8jcb1i5nqbff9/teachers.csv?dl=0" AS row
 fieldterminator ";"
 CREATE (n:Teacher:User)
 SET n = row;
 
-LOAD CSV WITH HEADERS FROM "file:///students.csv" AS row
+LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/tbng7ene99i4d8z/students.csv?dl=0" AS row
 fieldterminator ";"
 CREATE (n:Student:User)
 SET n = row;
@@ -27,40 +25,40 @@ SET n = row;
 
 veze:
 
-LOAD CSV WITH HEADERS FROM "file:///enroles.csv" AS row
+LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/bd193ushwboo4fh/enrolled_in.csv?dl=0" AS row
 fieldterminator ";"
 MATCH (k:Subject), (s:Student)
-WHERE k.subjectID = row.subjectID AND s.jmbag = row.studentID 
+WHERE k.subjectID = row.subjectID AND s.jmbag = row.jmbag
 CREATE (s)-[v:ENROLLED_IN]->(k)
 SET v.timesEnrolled = toInteger(row.timesEnrolled),
 v.grade = toInteger(row.grade);
 
-LOAD CSV WITH HEADERS FROM "file:///in.csv" AS row
+LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/vlrv5blmdyj4qjb/in.csv?dl=0" AS row
 fieldterminator ";"
 MATCH (e:Exam), (s:Subject)
-WHERE e.examID = row.examID AND s.subjectID = row.subjectID 
-CREATE (e)-[f:IN]->(s);
+WHERE e.examID = row.examID AND s.subjectID = row.subjectID
+CREATE (e)-[i:IN]->(s);
 
-LOAD CSV WITH HEADERS FROM "file:///teaches.csv" AS row
+LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/47duamzr0e06n8l/teaches.csv?dl=0" AS row
 fieldterminator ";"
 MATCH (p:Teacher), (s:Subject)
-WHERE p.oib = row.professorID AND s.subjectID = row.subjectID 
+WHERE p.oib = row.oib AND s.subjectID = row.subjectID
 CREATE (p)-[f:TEACHES]->(s)
 SET f = row;
 
-LOAD CSV WITH HEADERS FROM "file:///takes.csv" AS row
+LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/qn6hgtdnq72gls9/takes.csv?dl=0" AS row
 fieldterminator ";"
 MATCH (e:Exam), (s:Student)
-WHERE e.examID = row.examID AND s.jmbag = row.studentID 
+WHERE e.examID = row.examID AND s.jmbag = row.jmbag
 CREATE (e)<-[v:TAKES]-(s)
 SET v = row,
 v.passed = toBoolean(row.passed),
 v.score = toFloat(row.score),
 v.grade = toInteger(row.grade);
 
-LOAD CSV WITH HEADERS FROM "file:///registered.csv" AS row
+LOAD CSV WITH HEADERS FROM "https://dl.dropboxusercontent.com/s/i3t2b9zqujd843e/registered.csv?dl=0" AS row
 fieldterminator ";"
 MATCH (e:Exam), (s:Student)
-WHERE e.examID = row.examID AND s.jmbag = row.studentID 
+WHERE e.examID = row.examID AND s.jmbag = row.jmbag
 CREATE (e)<-[v:REGISTERED_FOR]-(s)
 SET v = row;

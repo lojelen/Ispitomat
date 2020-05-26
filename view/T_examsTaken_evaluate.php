@@ -2,14 +2,14 @@
 
   require_once "view/_navSubject.php"; ?>
 
-  <div id="students">
+  <div class="students">
   <?php
-    if(empty($data)){
+    if (empty($data)){
       echo "Nema studenata s neupisanim bodovima.";
     }
     else {
   ?>
-    <form id="saveForm" method="post" action="ispitomat.php?rt=teacher/save&examID=<?php echo $data[0]["exam"]->id; ?>">
+    <form id="saveForm" method="post" action="ispitomat.php?rt=teacher/save&examID=<?php echo $data[0]["exam"]->examID; ?>">
     <ul>
   <?php
 
@@ -27,7 +27,7 @@
   } ?>
     </ul>
 
-    <button type="submit" name="saveButton" id="save_<?php echo $data[0]["exam"]->id; ?>">Spremi bodove</button>
+    <button type="submit" name="saveButton" id="save_<?php echo $data[0]["exam"]->examID; ?>">Spremi bodove</button>
     </form>
 
   <?php

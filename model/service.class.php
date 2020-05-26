@@ -188,7 +188,7 @@ class Service
 			$student = $studentsRepository->findOneBy(["userID" => $userID]);
 
 			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
-			$exam = $examsRepository->find($examID);
+			$exam = $examsRepository->findOneBy(["examID" => $examID]);
 
 			$student->examsRegisteredFor->add($exam);
 			$exam->studentsRegistered->add($student);
@@ -240,7 +240,7 @@ class Service
 			$student = $studentsRepository->findOneBy(["userID" => $userID]);
 
 			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
-			$exam = $examsRepository->find($examID);
+			$exam = $examsRepository->findOneBy(["examID" => $examID]);
 
 			$student->examsRegisteredFor->removeElement($exam);
 			$exam->studentsRegistered->removeElement($student);
@@ -259,7 +259,7 @@ class Service
 
 			$examsTaken = $student->examsTaken;
 			foreach ($examsTaken as $examTaken) {
-				if ($examTaken->exam->id === intval($examID)) {
+				if ($examTaken->exam->examID === intval($examID)) {
 					$examGrade = $examTaken->grade;
 					$et = $examTaken;
 					break;
@@ -288,7 +288,7 @@ class Service
 
 			$examsTaken = $student->examsTaken;
 			foreach ($examsTaken as $examTaken) {
-				if ($examTaken->exam->id === intval($examID)) {
+				if ($examTaken->exam->examID === intval($examID)) {
 					$examTaken->grade = null;
 					break;
 				}
@@ -402,10 +402,15 @@ class Service
 				$currSchoolYear = $currYear . "./" . $currYear + 1 . ".";
 			else
 				$currSchoolYear = $currYear - 1 . "./" . $currYear . ".";
-
  			$exam->__set("schoolYear", $currSchoolYear);
 
 			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+
+			$query = $em->createQuery("MATCH (e:Exam) RETURN max(toInt(e.examID)) as maxID");
+			$result = $query->execute()[0];
+			$newExamID = intval($result["maxID"]) + 1;
+			$exam->__set("examID", strval($newExamID));
+
  			$exams = $examsRepository->findBy(["date" => $date, "location" => $location]);
 
  			foreach ($exams as $e) {
@@ -458,6 +463,12 @@ class Service
  			$exam->__set("schoolYear", $currSchoolYear);
 
 			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
+
+			$query = $em->createQuery("MATCH (e:Exam) RETURN max(toInt(e.examID)) as maxID");
+			$result = $query->execute()[0];
+			$newExamID = intval($result["maxID"]) + 1;
+			$exam->__set("examID", strval($newExamID));
+
   		$exams = $examsRepository->findBy(["date" => $date, "location" => $location]);
 
   		if (!empty($exams)) {
@@ -478,23 +489,22 @@ class Service
  		}
  		catch(Exception $e) { return $e->getMessage(); }
 
- 		return "OK";
-
+ 		return "HEJ";
  	}
 
- 	function editExam($id, $location, $max)
+ 	function editExam($examID, $location, $max)
  	{
  		try {
  			$em = DB::getConnection();
 
 
  			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
- 			$exam = $examsRepository->find($id);
+ 			$exam = $examsRepository->findOneBy(["examID" => $examID]);
 
 			$exams = $examsRepository->findBy(["date" => $exam->date, "location" => $location]);
 
  			foreach ($exams as $e) {
-				if(strcmp($exam->id, $e->id) === 0) continue;
+				if(strcmp($exam->examID, $e->examID) === 0) continue;
 				if(strcmp($e->type, "oral") === 0) return "Postoji usmeni ispit taj dan na toj lokaciji.";
  				$t1 = substr($e->time, 0, 5);
  				$t2 = substr($exam->time, 0, 5);
@@ -539,7 +549,7 @@ class Service
  			$em = DB::getConnection();
 
  			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
- 			$exam = $examsRepository->find($examID);
+ 			$exam = $examsRepository->findOneBy(["examID" => $examID]);
 
  			$em->flush();
  		}
@@ -554,7 +564,7 @@ class Service
  			$em = DB::getConnection();
 
  			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
- 			$exam = $examsRepository->find($examID);
+ 			$exam = $examsRepository->findOneBy(["examID" => $examID]);
 
  			foreach ($passed as $jmbag => $value) {
 
@@ -583,7 +593,7 @@ class Service
  			$em = DB::getConnection();
 
  			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
- 			$exam = $examsRepository->find($examID);
+ 			$exam = $examsRepository->findOneBy(["examID" => $examID]);
 
  		}
  		catch(Exception $e) { exit("Error " . $e->getMessage()); }
@@ -604,7 +614,7 @@ class Service
  			$em = DB::getConnection();
 
  			$examsRepository = $em->getRepository(\Ispitomat\Exam::class);
- 			$exam = $examsRepository->find($examID);
+ 			$exam = $examsRepository->findOneBy(["examID" => $examID]);
 
  		}
  		catch(Exception $e) { exit("Error " . $e->getMessage()); }

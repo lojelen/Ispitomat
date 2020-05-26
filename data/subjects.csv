@@ -1,23 +1,23 @@
 ﻿subjectID;subjectName;semester;oralExam
-21498;Matematička analiza 1;Z;TRUE
-21501;Linearna algebra 1;Z;TRUE
-21504;Elementarna matematika 1;Z;TRUE
-36901;Programiranje 1;Z;FALSE
-21508;Matematička analiza 2;LJ;TRUE
-21515;Linearna algebra 2;LJ;TRUE
-21518;Elementarna matematika 2;LJ;FALSE
-36903;Programiranje 2;LJ;FALSE
-36905;Vjerojatnost;Z;TRUE
-36904;Diskretna matematika;Z;TRUE
-186318;Diferencijalni račun 1;Z;TRUE
-24206;Strukture podataka i algoritmi;Z;FALSE
-92892;Teorija brojeva;LJ;TRUE
-186319;Diferencijalni račun 2;LJ;TRUE
-31427;Numerička matematika;LJ;TRUE
-24207;Računarski praktikum 1;LJ;FALSE
-36911;Vektorski prostori;Z;TRUE
-97015;Statistika;LJ;TRUE
-33220;Mjera i integral;LJ;TRUE
-31425;Algebarske strukture;Z;FALSE
-33145;Teorija skupova;Z;TRUE
-33083;Kompleksna analiza;LJ;TRUE
+21498;Matematička analiza 1;Z;true
+21501;Linearna algebra 1;Z;true
+21504;Elementarna matematika 1;Z;true
+36901;Programiranje 1;Z;false
+21508;Matematička analiza 2;LJ;true
+21515;Linearna algebra 2;LJ;true
+21518;Elementarna matematika 2;LJ;false
+36903;Programiranje 2;LJ;false
+36905;Vjerojatnost;Z;true
+36904;Diskretna matematika;Z;true
+186318;Diferencijalni račun 1;Z;true
+24206;Strukture podataka i algoritmi;Z;false
+92892;Teorija brojeva;LJ;true
+186319;Diferencijalni račun 2;LJ;true
+31427;Numerička matematika;LJ;true
+24207;Računarski praktikum 1;LJ;false
+36911;Vektorski prostori;Z;true
+97015;Statistika;LJ;true
+33220;Mjera i integral;LJ;true
+31425;Algebarske strukture;Z;false
+33145;Teorija skupova;Z;true
+33083;Kompleksna analiza;LJ;true

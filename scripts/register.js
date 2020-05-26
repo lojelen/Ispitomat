@@ -14,7 +14,7 @@ $(document).ready(function()
       dataType: "json",
       success: function(data)
       {
-        var elements = examsDiv.children("." . parentClass);
+        var elements = examsDiv.children("." + parentClass);
         for (var i = 0 ; i < elements.length ; ++i)
           elements.eq(i).remove();
         examsDiv.prepend("<div class='info'>Uspješno ste se prijavili na ispit ID-a " + examID + "!</div>");

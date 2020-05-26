@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf8">
 	<title>Ispitomat</title>
-	<link rel="stylesheet" type="text/css" href="./css/style.css">
+	<link rel="stylesheet" type="text/css" href="./css/style.css?<?php echo date('l jS \of F Y h:i:s A'); ?>"/>
 	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Atomic+Age"/>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 </head>

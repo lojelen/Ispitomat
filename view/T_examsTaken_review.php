@@ -2,16 +2,16 @@
 
    require_once "view/_navSubject.php"; ?>
 
-   <div id="students">
+   <div class="students">
    <ul>
    <?php
-   if(empty($data)){
+   if (empty($data)){
      echo "Nema upisanih bodova.";
    }
    else{
      foreach($data as $st)
      {
-       echo '<li> <div class="studentScore"> '.$st["student"]->jmbag . '<hr>';
+       echo '<li><div class="studentScore">' . $st["student"]->jmbag . '<hr>';
        echo 'Broj bodova: '.$st["score"] . '/' . $st["maxScore"] . '<br>';
        if($st["passed"]){
          echo 'Prošao/la. ';

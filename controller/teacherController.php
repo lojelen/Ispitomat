@@ -52,7 +52,7 @@ class TeacherController
  	{
 		$tus = new Service();
 
- 		$subject= $tus->getSubjectBySubjectID($_SESSION["subjectID"]);
+ 		$subject = $tus->getSubjectBySubjectID($_SESSION["subjectID"]);
 
  		require_once "view/T_addExam_index.php";
  	}

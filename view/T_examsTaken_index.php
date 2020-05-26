@@ -2,7 +2,7 @@
 
  require_once "view/_navSubject.php"; ?>
 
- <div id="exams">
+ <div class="exams">
 
  <?php
 foreach($examsData as $examData)
@@ -38,12 +38,12 @@ foreach($examsData as $examData)
   if(strcmp($currSchoolYear,$examData["exam"]->schoolYear) === 0)
   {
   ?>
-  <form id="evaluateForm" method="post" action="ispitomat.php?rt=teacher/evaluate&examID=<?php echo $examData["exam"]->id; ?>">
-    <button type="submit" name="evaluateButton" id="evaluate_<?php echo $examData["exam"]->id; ?>">Upiši bodove</button>
+  <form id="evaluateForm" method="post" action="ispitomat.php?rt=teacher/evaluate&examID=<?php echo $examData["exam"]->examID; ?>">
+    <button type="submit" name="evaluateButton" id="evaluate_<?php echo $examData["exam"]->examID; ?>">Upiši bodove</button>
   </form>
 <?php }?>
-  <form id="reviewForm" method="post" action="ispitomat.php?rt=teacher/review&examID=<?php echo $examData["exam"]->id; ?>">
-    <button type="submit" name="reviewButton" id="review_<?php echo $examData["exam"]->id; ?>">Pregledaj upisane bodove</button>
+  <form id="reviewForm" method="post" action="ispitomat.php?rt=teacher/review&examID=<?php echo $examData["exam"]->examID; ?>">
+    <button type="submit" name="reviewButton" id="review_<?php echo $examData["exam"]->examID; ?>">Pregledaj upisane bodove</button>
    </form>
 </div>
 <?php } ?>

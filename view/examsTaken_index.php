@@ -36,8 +36,8 @@ foreach($examsData as $examData)
   echo $examInfo;
 
   if ($canAcceptOrReject) {
-    echo "<button type='button' class='acceptButton' id='accept_" . $examData["exam"]->id . "'>Prihvati ocjenu</button>";
-    echo "<button type='button' class='rejectButton' id='reject_" . $examData["exam"]->id . "'>Odbij ocjenu</button>";
+    echo "<button type='button' class='acceptButton' id='accept_" . $examData["exam"]->examID . "'>Prihvati ocjenu</button>";
+    echo "<button type='button' class='rejectButton' id='reject_" . $examData["exam"]->examID . "'>Odbij ocjenu</button>";
   }
   echo "</div>";
 } ?>

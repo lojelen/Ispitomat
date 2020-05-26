@@ -24,11 +24,11 @@ foreach($exams as $exam)
   $examInfo = $examInfo . "<li><b>Lokacija ispita:</b> " . $exam["exam"]->location . "</li></ul>";
   echo $examInfo; ?>
 
-<button type="button" class="registerButton" id="register_<?php echo $exam["exam"]->id; ?>">Prijavi se</button>
+<button type="button" class="registerButton" id="register_<?php echo $exam["exam"]->examID; ?>">Prijavi se</button>
 </div>
 <?php } ?>
 </div>
 
-<script src="./scripts/register.js"></script>
+<script src="./scripts/register.js?2"></script>
 
 <?php require_once "view/_footer.php"; ?>

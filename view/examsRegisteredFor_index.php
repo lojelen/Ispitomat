@@ -25,7 +25,7 @@ foreach($exams as $exam)
   echo $examInfo;
 
 if ($exam["deregister"])
-  echo "<button type='button' class='deregisterButton' id='deregister_" . $exam["exam"]->id . "'>Odjavi se</button>"
+  echo "<button type='button' class='deregisterButton' id='deregister_" . $exam["exam"]->examID . "'>Odjavi se</button>"
 ?>
 </div>
 <?php } ?>

@@ -2,7 +2,7 @@
 
  require_once "view/_navSubject.php"; ?>
 
- <div id="exams">
+ <div class="exams">
 
  <?php
 
@@ -19,8 +19,8 @@
    $examInfo = $examInfo . "<li><b>Maksimalan broj bodova:</b> " . $exam["exam"]->maxScore . "</li></ul>";
    echo $examInfo; ?>
 
-   <form id="evaluateForm" method="post" action="ispitomat.php?rt=teacher/edit&examID=<?php echo $exam["exam"]->id; ?>">
-     <button type="submit" class="editButton" id="edit_<?php echo $exam["exam"]->id; ?>">Uredi</button>
+   <form id="evaluateForm" method="post" action="ispitomat.php?rt=teacher/edit&examID=<?php echo $exam["exam"]->examID; ?>">
+     <button type="submit" class="editButton" id="edit_<?php echo $exam["exam"]->examID; ?>">Uredi</button>
    </form>
  </div>
  <?php } ?>
