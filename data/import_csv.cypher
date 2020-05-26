@@ -51,15 +51,15 @@ fieldterminator ";"
 MATCH (p:Teacher), (s:Subject)
 WHERE p.oib = row.oib AND s.subjectID = row.subjectID
 CREATE (p)-[f:TEACHES]->(s)
-SET f = row;
+SET f.startOfTeaching = row.startOfTeaching,
+f.role = row.role;
 
 LOAD CSV WITH HEADERS FROM "file:///takes.csv" AS row
 fieldterminator ";"
 MATCH (e:Exam), (s:Student)
 WHERE e.examID = row.examID AND s.jmbag = row.jmbag
 CREATE (e)<-[v:TAKES]-(s)
-SET v = row,
-v.passed = toBoolean(row.passed),
+SET v.passed = toBoolean(row.passed),
 v.score = toFloat(row.score),
 v.grade = toInteger(row.grade);
 
@@ -67,5 +67,4 @@ LOAD CSV WITH HEADERS FROM "file:///registered.csv" AS row
 fieldterminator ";"
 MATCH (e:Exam), (s:Student)
 WHERE e.examID = row.examID AND s.jmbag = row.jmbag
-CREATE (e)<-[v:REGISTERED_FOR]-(s)
-SET v = row;
+CREATE (e)<-[v:REGISTERED_FOR]-(s);
