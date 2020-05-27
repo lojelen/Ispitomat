@@ -388,6 +388,11 @@ class Service
  			$em = DB::getConnection();
  			$exam = new Exam();
 
+			$d = date("Y-m-d");
+			$dExam = date("Y-m-d", strtotime($date));
+			if ($dExam <= $d)
+				return "Ne možete dodati ispit čiji datum nije kasniji od trenutnog.";
+
  			$exam->__set("date",$date);
  			$exam->__set("type","written");
  			$exam->__set("time",$time);
@@ -395,7 +400,6 @@ class Service
  			$exam->__set("location",$location);
  			$exam->__set("maxScore",$max);
 
-			$d = date("Y-m-d");
 			$currYear = substr($d, 0, 4);
 			$currMonth = substr($d, 5, 2);
 			if (intval($currMonth) > 9)
@@ -447,12 +451,16 @@ class Service
  			$em = DB::getConnection();
  			$exam = new Exam();
 
+			$d = date("Y-m-d");
+			$dExam = date("Y-m-d", strtotime($date));
+			if ($dExam <= $d)
+				return "Ne možete dodati ispit čiji datum nije kasniji od trenutnog.";
+
  			$exam->__set("date",$date);
  			$exam->__set("type","oral");
  			$exam->__set("location",$location);
  			$exam->__set("maxScore",$max);
 
-			$d = date("Y-m-d");
 			$currYear = substr($d, 0, 4);
 			$currMonth = substr($d, 5, 2);
 			if (intval($currMonth) > 9)
