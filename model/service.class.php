@@ -369,8 +369,8 @@ class Service
  		{
  			$em = DB::getConnection();
  			$query = $em->createQuery("MATCH (subject:Subject {subjectID:{subjectID}})<-[:IN]-(exam:Exam)
- 																 WHERE date(exam.date)>date()
- 																 RETURN exam, subject, exam.date AS date");
+ 																 WHERE date(exam.date)>=date()
+ 																 RETURN exam, subject, exam.date AS date, size((exam)<-[:REGISTERED_FOR]-(:Student)) AS numStudents");
  			$query->addEntityMapping("exam", \Ispitomat\Exam::class)
  						->addEntityMapping("subject", \Ispitomat\Subject::class);
  			$query->setParameter("subjectID", $subjectID);
@@ -378,7 +378,28 @@ class Service
  		}
  		catch(Exception $e) { exit("Error " . $e->getMessage()); }
 
- 		return $results;
+		$exams = [];
+		date_default_timezone_set("Europe/Zagreb");
+		foreach ($results as $result) {
+			$d1 = date("Y-m-d", strtotime($result["date"]));
+			$d2 = date("Y-m-d");
+			if ($d1 > $d2) {
+				$exams[] = ["exam" => $result["exam"], "subject" => $result["subject"], "date" => $result["date"], "modify" => true,
+										"numStudents" => $result["numStudents"]];
+			}
+			else if (strcmp($result["exam"]->type, "oral") === 0)
+				continue;
+			else { // written & $d1 === $d2
+				$t1 = substr($result["exam"]->time, 0, 5);
+				$t2 = date("H:i", time());
+				$t1 = intval(substr($t1, 0, 2)) * 60 + intval(substr($t1, 3, 2)) + $result["exam"]->duration;
+				$t2 = intval(substr($t2, 0, 2)) * 60 + intval(substr($t2, 3, 2));
+				if ($t1 > $t2)
+					$exams[] = ["exam" => $result["exam"], "subject" => $result["subject"], "date" => $result["date"], "modify" => false,
+											"numStudents" => $result["numStudents"]];
+			}
+		}
+		return $exams;
  	}
 
 	function insertWrittenExam($subjectID, $date, $time, $duration, $location, $max)
