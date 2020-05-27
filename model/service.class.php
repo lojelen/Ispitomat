@@ -259,7 +259,7 @@ class Service
 
 			$examsTaken = $student->examsTaken;
 			foreach ($examsTaken as $examTaken) {
-				if ($examTaken->exam->examID === intval($examID)) {
+				if (strcmp($examTaken->exam->examID, $examID) === 0) {
 					$examGrade = $examTaken->grade;
 					$et = $examTaken;
 					break;
@@ -288,7 +288,7 @@ class Service
 
 			$examsTaken = $student->examsTaken;
 			foreach ($examsTaken as $examTaken) {
-				if ($examTaken->exam->examID === intval($examID)) {
+				if (strcmp($examTaken->exam->examID, $examID) === 0) {
 					$examTaken->grade = null;
 					break;
 				}
@@ -369,7 +369,7 @@ class Service
  		{
  			$em = DB::getConnection();
  			$query = $em->createQuery("MATCH (subject:Subject {subjectID:{subjectID}})<-[:IN]-(exam:Exam)
- 																 WHERE date(exam.date)>=date()
+ 																 WHERE date(exam.date)>=date({ timezone: 'Europe/Zagreb' })
  																 RETURN exam, subject, exam.date AS date, size((exam)<-[:REGISTERED_FOR]-(:Student)) AS numStudents");
  			$query->addEntityMapping("exam", \Ispitomat\Exam::class)
  						->addEntityMapping("subject", \Ispitomat\Subject::class);
