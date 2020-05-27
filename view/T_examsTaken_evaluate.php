@@ -22,7 +22,7 @@
     echo '<input type="radio" name="passed_'.$st["student"]->jmbag.'" value="NE"> NE <br>';
 
     if($st["subject"]->oralExam === false || ($st["subject"]->oralExam === true && strcmp($st["exam"]->type, "oral") === 0)) {
-      echo 'Ocjena: <input type="number" name="grade_'.$st["student"]->jmbag.'" step="1" min="2" max="5" value="1">';
+      echo 'Ocjena: <input type="number" name="grade_'.$st["student"]->jmbag.'" step="1" min="2" max="5" value="2">';
     }
     echo '</div></li>';
   } ?>
