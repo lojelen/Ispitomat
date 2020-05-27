@@ -187,10 +187,6 @@ button {
   font-family: "Atomic Age";
 }
 
-.info {
-  margin: 10px;
-}
-
 .current {
   background-color: #E9E9E9;
 }
@@ -231,4 +227,10 @@ hr {
 #newExamForm button {
   width: 150px;
   margin-right: 50px;
+}
+
+.info {
+  margin-top: 10px;
+  position: relative;
+  left: 2%;
 }
