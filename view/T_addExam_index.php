@@ -5,7 +5,6 @@
          document.getElementById('ifWritten').style.display = 'block';
      }
      else document.getElementById('ifWritten').style.display = 'none';
-
  }
 
 </script>

@@ -489,7 +489,7 @@ class Service
  		}
  		catch(Exception $e) { return $e->getMessage(); }
 
- 		return "HEJ";
+ 		return "OK";
  	}
 
  	function editExam($examID, $location, $max)

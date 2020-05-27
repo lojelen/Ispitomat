@@ -3,12 +3,12 @@
    require_once "view/_navSubject.php"; ?>
 
    <div class="students">
-   <ul>
    <?php
-   if (empty($data)){
-     echo "Nema upisanih bodova.";
+   if (empty($data)) {
+     echo "<div class='noStudents'>Nema upisanih bodova.</div>";
    }
-   else{
+   else {
+     echo "<ul>";
      foreach($data as $st)
      {
        echo '<li><div class="studentScore">' . $st["student"]->jmbag . '<hr>';
@@ -23,5 +23,5 @@
      }
    }
   ?>
-   </ul>
+  </ul>
   </div>
