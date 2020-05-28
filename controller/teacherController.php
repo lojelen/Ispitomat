@@ -134,7 +134,7 @@ class TeacherController
 
  				foreach ($jmbag as $j) {
  					if (isset($_POST["score_".$j]) && isset($_POST["passed_".$j])){
-						if (strcmp($_POST["passed_".$j],"DA") === 0)
+						if (isset($_POST["grade_".$j]) && strcmp($_POST["passed_".$j],"DA") === 0)
 							$g = $_POST["grade_".$j];
 						else
  							$g = null;
