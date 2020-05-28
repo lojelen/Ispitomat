@@ -134,15 +134,17 @@ class TeacherController
 
  				foreach ($jmbag as $j) {
  					if (isset($_POST["score_".$j]) && isset($_POST["passed_".$j])){
- 						if (isset($_POST["grade_".$j])) $g = $_POST["grade_".$j];
- 						else $g = null;
+						if (strcmp($_POST["passed_".$j],"DA") === 0)
+							$g = $_POST["grade_".$j];
+						else
+ 							$g = null;
 
  						if (strcmp($_POST["passed_".$j],"DA") === 0) $p = true;
  						else $p = false;
 
- 						$score = [ $j =>$_POST["score_".$j]];
- 						$passed = [ $j => $p];
- 						$grade = [ $j => $g];
+ 						$score[$j] = $_POST["score_".$j];
+ 						$passed[$j] = $p;
+ 						$grade[$j] = $g;
  					}
  				}
 
